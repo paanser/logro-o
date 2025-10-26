@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vidres Sosa – Calculadora MAPFRE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Vidres Sosa – Calculadora MAPFRE</h1>
+
+        <section>
+            <h2>1. Medidas del vidrio (en metros)</h2>
+            <label>Ancho (m):</label>
+            <input type="number" id="ancho" step="0.01" min="0.01">
+            <label>Alto (m):</label>
+            <input type="number" id="alto" step="0.01" min="0.01">
+            <button onclick="calcularArea()">Calcular área</button>
+            <div id="resultadoArea"></div>
+        </section>
+
+        <section>
+            <h2>2. Selección del vidrio</h2>
+            <label>Método:</label>
+            <select id="metodoPrecio" onchange="togglePrecioManual()">
+                <option value="tarifa">Seleccionar desde tarifa MAPFRE</option>
+                <option value="manual">Introducir precio manual</option>
+            </select>
+            <div id="tarifaContainer">
+                <select id="selectVidrio"></select>
+            </div>
+            <div id="manualContainer" style="display:none;">
+                <input type="number" id="precioManual" step="0.1" min="0" placeholder="€/m²">
+            </div>
+            <button onclick="calcularPrecio()">Calcular precio total</button>
+            <div id="resultadoPrecio"></div>
+        </section>
+
+        <section>
+            <h2>3. Canto pulido (opcional)</h2>
+            <label><input type="checkbox" id="chkCanto" onchange="toggleCanto()"> Añadir canto pulido</label>
+            <div id="cantoContainer" style="display:none;">
+                <label>Método:</label>
+                <select id="metodoCanto" onchange="toggleCantoManual()">
+                    <option value="tarifa">Seleccionar desde tarifa MAPFRE</option>
+                    <option value="manual">Precio manual</option>
+                </select>
+                <div id="tarifaCantoContainer">
+                    <select id="selectCanto"></select>
+                </div>
+                <div id="manualCantoContainer" style="display:none;">
+                    <input type="number" id="precioCantoManual" step="0.1" min="0" placeholder="€/ml">
+                </div>
+                <label>Lados anchos a pulir:</label>
+                <input type="number" id="ladosAnchos" step="1" min="0">
+                <label>Lados largos a pulir:</label>
+                <input type="number" id="ladosLargos" step="1" min="0">
+                <button onclick="calcularCanto()">Calcular canto</button>
+                <div id="resultadoCanto"></div>
+            </div>
+        </section>
+
+        <section>
+            <h2>4. Resumen total</h2>
+            <button onclick="mostrarResumen()">Mostrar resumen</button>
+            <div id="resumen"></div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
