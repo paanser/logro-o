@@ -1,51 +1,53 @@
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #fafafa;
-    color: #333;
-    margin: 0;
-    padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #fafafa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+.lockscreen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #e6e6e6;
+}
+.lock-card {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+  text-align: center;
+  width: 280px;
+}
+.logo {
+  max-width: 120px;
+  margin-bottom: 15px;
+}
+.error {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
 }
 .container {
-    max-width: 700px;
-    margin: 30px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-h1 {
-    color: #1d6b34;
-    text-align: center;
-}
-h2 {
-    color: #444;
-    margin-top: 25px;
-}
-label {
-    display: block;
-    margin-top: 10px;
-}
-input, select, button {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+  max-width: 700px;
+  margin: 30px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 button {
-    background: #1d6b34;
-    color: white;
-    font-weight: bold;
-    border: none;
-    margin-top: 15px;
-    cursor: pointer;
+  background: #1d6b34;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px;
+  width: 100%;
+  font-weight: bold;
+  margin-top: 10px;
+  cursor: pointer;
 }
 button:hover {
-    background: #28a745;
-}
-#resultadoArea, #resultadoPrecio, #resultadoCanto, #resumen {
-    margin-top: 10px;
-    padding: 10px;
-    background: #f2f2f2;
-    border-radius: 5px;
+  background: #28a745;
 }

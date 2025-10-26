@@ -3,34 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculadora Vidres Sosa – Presupuestos MAPFRE</title>
+  <title>Calculadora Vidres Sosa – MAPFRE</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Pantalla de acceso -->
-  <div id="lockscreen" class="lock">
+  <div id="lockscreen" class="lockscreen">
     <div class="lock-card">
       <img src="VS logo ILoo.JPG" alt="Logo Vidres Sosa" class="logo" />
       <h2>Acceso</h2>
       <p class="muted">Introduce la contraseña para continuar</p>
       <input type="password" id="pwd" placeholder="•••" />
-      <button onclick="login()">Entrar</button>
+      <button id="btnEntrar">Entrar</button>
       <p id="loginMsg" class="error"></p>
     </div>
   </div>
 
-  <!-- App -->
   <div class="container" id="app" style="display:none;">
     <header class="header">
       <div class="brand">
         <img src="VS logo ILoo.JPG" alt="Logo Vidres Sosa" class="logo" />
         <h1>Vidres Sosa</h1>
-      </div>
-      <div class="actions">
-        <label class="switch">
-          <input type="checkbox" id="themeToggle" />
-          <span class="slider"></span>
-        </label>
       </div>
     </header>
 
@@ -44,7 +36,7 @@
       <div id="resultadoArea"></div>
     </section>
 
-    <section id="secVidrio" style="display:none;">
+    <section>
       <h2>2️⃣ Selección de vidrio</h2>
       <select id="selectVidrio"></select>
       <label>Precio manual (€ / m²)</label>
@@ -53,23 +45,25 @@
       <div id="resultadoPrecio"></div>
     </section>
 
-    <section id="secExtras" style="display:none;">
-      <h2>3️⃣ Ajustes adicionales</h2>
-      <label>Descuento (%)</label>
-      <input type="number" id="descuento" min="0" max="100" step="0.5" value="0" />
-      <label><input type="checkbox" id="ivaIncluido" /> Incluir IVA (21%)</label>
-      <button onclick="mostrarResumen()">Mostrar resumen</button>
-      <button onclick="reiniciar()">Reiniciar</button>
-      <div id="resumen"></div>
+    <section>
+      <h2>3️⃣ Canto pulido (opcional)</h2>
+      <label><input type="checkbox" id="chkCanto" onchange="toggleCanto()"> Añadir canto pulido</label>
+      <div id="cantoContainer" style="display:none;">
+        <label>Lados anchos:</label><input type="number" id="ladosAnchos" min="0" max="2" value="0" />
+        <label>Lados largos:</label><input type="number" id="ladosLargos" min="0" max="2" value="0" />
+        <label>Precio por metro lineal (€):</label><input type="number" id="precioCanto" step="0.1" value="5" />
+        <button onclick="calcularCanto()">Calcular canto</button>
+        <div id="resultadoCanto"></div>
+      </div>
     </section>
 
-    <section id="secPDF" style="display:none;">
-      <h2>4️⃣ Exportar / Enviar</h2>
-      <button onclick="generarPDF()">📄 Generar PDF</button>
-      <button onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
+    <section>
+      <h2>4️⃣ Resumen</h2>
+      <button onclick="mostrarResumen()">Mostrar resumen</button>
+      <div id="resumen"></div>
     </section>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
