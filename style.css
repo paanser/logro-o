@@ -1,6 +1,6 @@
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: #eaeaea;
+  background: #e0e0e0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -16,7 +16,7 @@ body {
   box-shadow: 0 0 15px rgba(0,0,0,0.1);
   text-align: center;
   width: 90%;
-  max-width: 400px;
+  max-width: 420px;
   margin: 15px auto;
   animation: fadeIn 0.3s ease;
 }
@@ -37,7 +37,7 @@ body {
 }
 
 .mode-selector button {
-  background: #444;
+  background: #006e3b;
   color: white;
   border: none;
   padding: 10px 15px;
@@ -48,7 +48,7 @@ body {
 }
 
 .mode-selector button:hover {
-  background: #008cba;
+  background: #00994d;
 }
 
 .inputs {
@@ -62,7 +62,7 @@ body {
   font-weight: bold;
 }
 
-.inputs input {
+.inputs input, select {
   width: 100%;
   padding: 8px;
   border-radius: 5px;
@@ -71,7 +71,7 @@ body {
 }
 
 .mode button {
-  background: #007b9e;
+  background: #006e3b;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -82,7 +82,7 @@ body {
 }
 
 .mode button:hover {
-  background: #009ed4;
+  background: #00994d;
 }
 
 .resultado {
@@ -97,6 +97,12 @@ body {
 #error {
   color: red;
   margin-top: 10px;
+}
+
+.info {
+  font-size: 0.9em;
+  color: #555;
+  margin-bottom: 10px;
 }
 
 @keyframes fadeIn {
