@@ -1,8 +1,7 @@
 /* =======================================
-   VIDRES SOSA — SCRIPT PRINCIPAL V3
+   VIDRES SOSA — SCRIPT PRINCIPAL V5 FINAL
    ======================================= */
 
-// -------------------- LOGIN --------------------
 document.addEventListener("DOMContentLoaded", () => {
   const loginDiv = document.getElementById("login");
   const appDiv = document.getElementById("app");
@@ -23,51 +22,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function checkPassword() {
     const input = passInput.value.trim();
-    const realPass = atob("MTIz"); // "123" codificado en Base64
+    const realPass = atob("MTIz"); // "123"
     if (input === realPass) {
       sessionStorage.setItem("logged", "true");
       loginDiv.style.display = "none";
       appDiv.style.display = "block";
       initApp();
-    } else {
-      errorMsg.textContent = "Contraseña incorrecta.";
-    }
+    } else errorMsg.textContent = "Contraseña incorrecta.";
   }
 });
 
-// -------------------- APP PRINCIPAL --------------------
 function initApp() {
-  const btnManual = document.getElementById("btnManual");
-  const btnTarifa = document.getElementById("btnTarifa");
-  const manualDiv = document.getElementById("manual");
-  const tarifaDiv = document.getElementById("tarifa");
   const vidrioSelect = document.getElementById("vidrioSelect");
-
   let multiplos = [];
   let tarifa = [];
 
-  // ----------- Cargar múltiplos desde CSV -----------
+  // Cargar multiplos
   fetch("multiplos.csv")
-    .then(res => res.text())
-    .then(data => {
-      multiplos = data.trim().split("\n").map(v => parseFloat(v.replace(",", "."))).filter(Boolean);
-    })
+    .then(r => r.text())
+    .then(t => (multiplos = t.trim().split("\n").map(v => parseFloat(v.replace(",", "."))).filter(Boolean)))
     .catch(() => console.warn("No se pudo cargar multiplos.csv"));
 
-  // ----------- Cargar tarifa desde CSV -----------
+  // Cargar tarifa (solo ; como separador)
   fetch("tarifa_mapfre_completa.csv")
-    .then(res => res.text())
+    .then(r => r.text())
     .then(data => {
       const lineas = data.trim().split(/\r?\n/);
       vidrioSelect.innerHTML = "";
       lineas.forEach((linea, i) => {
         if (i > 0) {
-          const cols = linea.split(/[;,]/);
+          const cols = linea.split(";");
           const nombre = cols[0];
-          const precio = parseFloat(cols[cols.length - 2].replace(",", ".")) || 0;
-          const canto = parseFloat(cols[cols.length - 1].replace(",", ".")) || 0;
+          const precio = parseFloat((cols[1] || "0").replace(",", ".")) || 0;
+          const canto = parseFloat((cols[2] || "0").replace(",", ".")) || 0;
           tarifa.push({ nombre, precio, canto });
-
           const opt = document.createElement("option");
           opt.value = JSON.stringify({ precio, canto });
           opt.textContent = `${nombre} — ${precio.toFixed(2)} €/m²`;
@@ -75,18 +63,23 @@ function initApp() {
         }
       });
     })
-    .catch(() => console.warn("No se pudo cargar la tarifa."));
+    .catch(() => console.warn("Error al cargar tarifa."));
 
-  // ----------- Cambiar de modo -----------
-  btnManual.addEventListener("click", () => setMode("manual"));
-  btnTarifa.addEventListener("click", () => setMode("tarifa"));
+  // Cambiar modos
+  const btnManual = document.getElementById("btnManual");
+  const btnTarifa = document.getElementById("btnTarifa");
+  const manualDiv = document.getElementById("manual");
+  const tarifaDiv = document.getElementById("tarifa");
+
+  btnManual.onclick = () => setMode("manual");
+  btnTarifa.onclick = () => setMode("tarifa");
 
   function setMode(mode) {
-    const manualActive = mode === "manual";
-    manualDiv.style.display = manualActive ? "block" : "none";
-    tarifaDiv.style.display = manualActive ? "none" : "block";
-    btnManual.classList.toggle("active", manualActive);
-    btnTarifa.classList.toggle("active", !manualActive);
+    const manual = mode === "manual";
+    manualDiv.style.display = manual ? "block" : "none";
+    tarifaDiv.style.display = manual ? "none" : "block";
+    btnManual.classList.toggle("active", manual);
+    btnTarifa.classList.toggle("active", !manual);
     clearResults();
   }
 
@@ -95,126 +88,73 @@ function initApp() {
     document.getElementById("resultadoTarifa").innerHTML = "";
   }
 
-  // ----------- Función ajuste múltiplos -----------
-  function ajustarMultiplos(area) {
-    if (multiplos.length === 0) return Math.ceil(area * 100) / 100;
-    for (let i = 0; i < multiplos.length; i++) {
-      if (area <= multiplos[i]) return multiplos[i];
-    }
-    return multiplos[multiplos.length - 1];
-  }
+  const ajustarMultiplos = a => (multiplos.length ? multiplos.find(m => a <= m) || multiplos.at(-1) : Math.ceil(a * 100) / 100);
+  const aplicarMargen = (p, m) => (m ? p * (1 + m / 100) : p);
 
-  function aplicarMargen(precio, margen) {
-    return margen ? precio * (1 + margen / 100) : precio;
-  }
+  // ---------- MANUAL ----------
+  document.getElementById("btnCalcularManual").onclick = () => calcular("manual");
+  document.getElementById("btnNuevoManual").onclick = () => clearInputs("manual");
+  // ---------- TARIFA ----------
+  document.getElementById("btnCalcularTarifa").onclick = () => calcular("tarifa");
+  document.getElementById("btnNuevoTarifa").onclick = () => clearInputs("tarifa");
 
-  // -------------------- MODO MANUAL --------------------
-  document.getElementById("btnCalcularManual").addEventListener("click", calcularManual);
-  document.getElementById("btnNuevoManual").addEventListener("click", () => clearInputs("manual"));
+  function calcular(mode) {
+    const a = parseFloat(document.getElementById(`ancho${mode === "manual" ? "Manual" : "Tarifa"}`).value) || 0;
+    const b = parseFloat(document.getElementById(`alto${mode === "manual" ? "Manual" : "Tarifa"}`).value) || 0;
+    const u = parseInt(document.getElementById(`unidades${mode === "manual" ? "Manual" : "Tarifa"}`).value) || 1;
+    const margen = parseFloat(document.getElementById(`margen${mode === "manual" ? "Manual" : "Tarifa"}`).value) || 0;
+    const res = document.getElementById(`resultado${mode === "manual" ? "Manual" : "Tarifa"}`);
 
-  function calcularManual() {
-    const ancho = parseFloat(document.getElementById("anchoManual").value) || 0;
-    const alto = parseFloat(document.getElementById("altoManual").value) || 0;
-    const unidades = parseInt(document.getElementById("unidadesManual").value) || 1;
-    const precioBase = parseFloat(document.getElementById("precioManual").value) || 0;
-    const margen = parseFloat(document.getElementById("margenManual").value) || 0;
-    const precioCanto = parseFloat(document.getElementById("precioCantoM").value) || 0;
-
-    const cantos = {
-      izq: document.getElementById("cantoIzqM").checked,
-      der: document.getElementById("cantoDerM").checked,
-      arr: document.getElementById("cantoArrM").checked,
-      aba: document.getElementById("cantoAbaM").checked
-    };
-
-    const resultado = document.getElementById("resultadoManual");
-    if (!ancho || !alto || !precioBase) {
-      resultado.textContent = "Introduce todos los valores.";
-      return;
+    let precioVidrio, precioCanto;
+    if (mode === "manual") {
+      precioVidrio = parseFloat(document.getElementById("precioManual").value) || 0;
+      precioCanto = parseFloat(document.getElementById("precioCantoM").value) || 0;
+    } else {
+      const vidrio = JSON.parse(vidrioSelect.value || "{}");
+      precioVidrio = vidrio.precio || 0;
+      precioCanto = parseFloat(document.getElementById("precioCanto").value) || vidrio.canto || 0;
     }
 
-    const area = ancho * alto;
+    if (!a || !b || !precioVidrio) return (res.textContent = "Introduce todos los valores.");
+
+    // Redondear lados a múltiplos de 6 cm
+    const Ared = Math.ceil(a / 0.06) * 0.06;
+    const Bred = Math.ceil(b / 0.06) * 0.06;
+    const area = Ared * Bred;
     const ajustado = ajustarMultiplos(area);
-    const precioFinal = aplicarMargen(precioBase, margen);
+    const precioFinal = aplicarMargen(precioVidrio, margen);
 
-    let metrosCanto = 0;
-    if (cantos.izq) metrosCanto += alto;
-    if (cantos.der) metrosCanto += alto;
-    if (cantos.arr) metrosCanto += ancho;
-    if (cantos.aba) metrosCanto += ancho;
+    // Cálculo de cantos
+    const c = mode === "manual" ? "" : "";
+    const a1 = document.getElementById(`ancho1${mode === "manual" ? "M" : ""}`).checked;
+    const a2 = document.getElementById(`ancho2${mode === "manual" ? "M" : ""}`).checked;
+    const l1 = document.getElementById(`largo1${mode === "manual" ? "M" : ""}`).checked;
+    const l2 = document.getElementById(`largo2${mode === "manual" ? "M" : ""}`).checked;
+    let ml = 0;
+    if (a1) ml += Ared;
+    if (a2) ml += 2 * Ared;
+    if (l1) ml += Bred;
+    if (l2) ml += 2 * Bred;
 
-    const costeCantos = metrosCanto * precioCanto * unidades;
-    const subtotalVidrio = ajustado * precioFinal * unidades;
+    const costeCantos = ml * precioCanto * u;
+    const subtotalVidrio = ajustado * precioFinal * u;
     const subtotal = subtotalVidrio + costeCantos;
     const iva = subtotal * 0.21;
     const total = subtotal + iva;
 
-    resultado.innerHTML = `
-      <b>Cálculo Manual</b><br>
-      Medidas: ${ancho.toFixed(2)} × ${alto.toFixed(2)} m = ${area.toFixed(2)} m²<br>
+    res.innerHTML = `
+      <b>${mode === "manual" ? "Cálculo Manual" : vidrioSelect.selectedOptions[0].textContent}</b><br>
+      Medidas introducidas: ${a.toFixed(3)} × ${b.toFixed(3)} m<br>
+      Medidas ajustadas: ${Ared.toFixed(2)} × ${Bred.toFixed(2)} m<br>
       Superficie ajustada: ${ajustado.toFixed(2)} m²<br>
       Precio vidrio: ${precioFinal.toFixed(2)} €/m²<br>
-      Cantos: ${metrosCanto.toFixed(2)} m × ${precioCanto.toFixed(2)} € = ${costeCantos.toFixed(2)} €<br>
-      Unidades: ${unidades}<br>
+      Cantos: ${ml.toFixed(2)} m × ${precioCanto.toFixed(2)} € = ${costeCantos.toFixed(2)} €<br>
+      Unidades: ${u}<br>
       Subtotal: ${subtotal.toFixed(2)} €<br>
       IVA (21%): ${iva.toFixed(2)} €<br>
       <b>Total: ${total.toFixed(2)} €</b>`;
   }
 
-  // -------------------- MODO TARIFA --------------------
-  document.getElementById("btnCalcularTarifa").addEventListener("click", calcularTarifa);
-  document.getElementById("btnNuevoTarifa").addEventListener("click", () => clearInputs("tarifa"));
-
-  function calcularTarifa() {
-    const ancho = parseFloat(document.getElementById("anchoTarifa").value) || 0;
-    const alto = parseFloat(document.getElementById("altoTarifa").value) || 0;
-    const unidades = parseInt(document.getElementById("unidadesTarifa").value) || 1;
-    const margen = parseFloat(document.getElementById("margenTarifa").value) || 0;
-    const vidrio = JSON.parse(document.getElementById("vidrioSelect").value || "{}");
-    const precioCanto = parseFloat(document.getElementById("precioCanto").value) || vidrio.canto || 0;
-
-    const cantos = {
-      izq: document.getElementById("cantoIzq").checked,
-      der: document.getElementById("cantoDer").checked,
-      arr: document.getElementById("cantoArr").checked,
-      aba: document.getElementById("cantoAba").checked
-    };
-
-    const resultado = document.getElementById("resultadoTarifa");
-    if (!ancho || !alto || !vidrio.precio) {
-      resultado.textContent = "Introduce todos los valores.";
-      return;
-    }
-
-    const area = ancho * alto;
-    const ajustado = ajustarMultiplos(area);
-    const precioFinal = aplicarMargen(vidrio.precio, margen);
-
-    let metrosCanto = 0;
-    if (cantos.izq) metrosCanto += alto;
-    if (cantos.der) metrosCanto += alto;
-    if (cantos.arr) metrosCanto += ancho;
-    if (cantos.aba) metrosCanto += ancho;
-
-    const costeCantos = metrosCanto * precioCanto * unidades;
-    const subtotalVidrio = ajustado * precioFinal * unidades;
-    const subtotal = subtotalVidrio + costeCantos;
-    const iva = subtotal * 0.21;
-    const total = subtotal + iva;
-
-    resultado.innerHTML = `
-      <b>${document.getElementById("vidrioSelect").selectedOptions[0].textContent}</b><br>
-      Medidas: ${ancho.toFixed(2)} × ${alto.toFixed(2)} m = ${area.toFixed(2)} m²<br>
-      Superficie ajustada: ${ajustado.toFixed(2)} m²<br>
-      Precio vidrio (m²): ${precioFinal.toFixed(2)} €<br>
-      Cantos: ${metrosCanto.toFixed(2)} m × ${precioCanto.toFixed(2)} € = ${costeCantos.toFixed(2)} €<br>
-      Unidades: ${unidades}<br>
-      Subtotal: ${subtotal.toFixed(2)} €<br>
-      IVA (21%): ${iva.toFixed(2)} €<br>
-      <b>Total: ${total.toFixed(2)} €</b>`;
-  }
-
-  // -------- LIMPIAR --------
   function clearInputs(mode) {
     document.querySelectorAll(`#${mode} input`).forEach(i => {
       if (i.type === "number") i.value = "";
@@ -223,26 +163,19 @@ function initApp() {
     clearResults();
   }
 
-  // -------------------- EXPORTAR PDF --------------------
-  document.getElementById("btnExportarPDF").addEventListener("click", exportarPDF);
-
-  function exportarPDF() {
-    if (!window.jspdf) {
-      alert("Falta la librería jsPDF para exportar.");
-      return;
-    }
+  document.getElementById("btnExportarPDF").onclick = () => {
+    if (!window.jspdf) return alert("Falta jsPDF para exportar.");
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const fecha = new Date().toLocaleDateString("es-ES");
-    const contenido = document.getElementById("resultadoManual").innerText || document.getElementById("resultadoTarifa").innerText || "Sin resultados para exportar.";
-
+    const texto = document.getElementById("resultadoManual").innerText || document.getElementById("resultadoTarifa").innerText || "Sin resultados para exportar.";
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text("Vidres Sosa - Presupuesto", 20, 20);
+    doc.text("Vidres Sosa – Presupuesto", 20, 20);
     doc.setFontSize(10);
     doc.text(`Fecha: ${fecha}`, 20, 28);
     doc.setFont("helvetica", "normal");
-    doc.text(contenido, 20, 40, { maxWidth: 170 });
+    doc.text(texto, 20, 40, { maxWidth: 170 });
     doc.save(`Presupuesto_VidresSosa_${fecha.replace(/\//g, "-")}.pdf`);
-  }
+  };
 }
