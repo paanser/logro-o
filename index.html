@@ -2,19 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculadora Vidres Sosa</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Aumento de ancho del selector */
-    #vidrioSelect {
-      width: 100%;
-      font-size: 0.95em;
-      padding: 10px;
-    }
-  </style>
 </head>
 <body>
+
   <!-- LOGIN -->
   <div id="login" class="card fade-in">
     <img src="logo.png" alt="Vidres Sosa" class="logo-login">
@@ -24,13 +17,14 @@
     <p id="error"></p>
   </div>
 
-  <!-- APP PRINCIPAL -->
+  <!-- APLICACIÓN PRINCIPAL -->
   <div id="app" style="display:none;">
     <header class="header">
       <img src="logo.png" alt="Vidres Sosa" class="logo">
       <h1>Calculadora de Vidrios</h1>
     </header>
 
+    <!-- Selector de modo -->
     <section class="mode-selector">
       <button id="btnManual" class="active">Modo Manual</button>
       <button id="btnTarifa">Modo Tarifa</button>
@@ -117,6 +111,7 @@
     </div>
   </div>
 
+  <!-- Script principal -->
   <script src="script.js"></script>
 </body>
 </html>
