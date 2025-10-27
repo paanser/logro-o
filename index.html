@@ -1,69 +1,55 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculadora Vidres Sosa – MAPFRE</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Vidres Sosa</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="lockscreen" class="lockscreen">
-    <div class="lock-card">
-      <img src="VS logo ILoo.JPG" alt="Logo Vidres Sosa" class="logo" />
-      <h2>Acceso</h2>
-      <p class="muted">Introduce la contraseña para continuar</p>
-      <input type="password" id="pwd" placeholder="•••" />
-      <button id="btnEntrar">Entrar</button>
-      <p id="loginMsg" class="error"></p>
+  <div id="login" class="centered">
+    <h2>Acceso</h2>
+    <input type="password" id="password" placeholder="Introduce la contraseña">
+    <button onclick="checkPassword()">Entrar</button>
+    <p id="error"></p>
+  </div>
+
+  <div id="app" style="display:none;">
+    <header>
+      <img src="logo.png" alt="Vidres Sosa" class="logo">
+      <h1>Calculadora de Precios</h1>
+    </header>
+
+    <div class="mode-selector">
+      <button onclick="setMode('manual')">Modo Manual</button>
+      <button onclick="setMode('tarifa')">Modo Tarifa</button>
+    </div>
+
+    <div id="manual" class="mode">
+      <h3>Cálculo Manual</h3>
+      <label>Ancho (mm):</label>
+      <input type="number" id="anchoManual" placeholder="Ej. 800">
+      <label>Alto (mm):</label>
+      <input type="number" id="altoManual" placeholder="Ej. 1200">
+      <label>Precio €/m²:</label>
+      <input type="number" id="precioManual" placeholder="Ej. 45">
+      <button onclick="calcularManual()">Calcular</button>
+      <p id="resultadoManual"></p>
+    </div>
+
+    <div id="tarifa" class="mode" style="display:none;">
+      <h3>Cálculo por Tarifa</h3>
+      <label>Ancho (mm):</label>
+      <input type="number" id="anchoTarifa" placeholder="Ej. 800">
+      <label>Alto (mm):</label>
+      <input type="number" id="altoTarifa" placeholder="Ej. 1200">
+      <label>Precio €/m² (tarifa):</label>
+      <input type="number" id="precioTarifa" placeholder="Ej. 55">
+      <button onclick="calcularTarifa()">Calcular</button>
+      <p id="resultadoTarifa"></p>
     </div>
   </div>
 
-  <div class="container" id="app" style="display:none;">
-    <header class="header">
-      <div class="brand">
-        <img src="VS logo ILoo.JPG" alt="Logo Vidres Sosa" class="logo" />
-        <h1>Vidres Sosa</h1>
-      </div>
-    </header>
-
-    <section>
-      <h2>1️⃣ Medidas del vidrio (m)</h2>
-      <label>Ancho (m):</label>
-      <input type="number" id="ancho" step="0.01" min="0.01" />
-      <label>Alto (m):</label>
-      <input type="number" id="alto" step="0.01" min="0.01" />
-      <button onclick="calcularArea()">Calcular área</button>
-      <div id="resultadoArea"></div>
-    </section>
-
-    <section>
-      <h2>2️⃣ Selección de vidrio</h2>
-      <select id="selectVidrio"></select>
-      <label>Precio manual (€ / m²)</label>
-      <input type="number" id="precioManual" step="0.1" placeholder="Opcional" />
-      <button onclick="calcularPrecio()">Calcular precio</button>
-      <div id="resultadoPrecio"></div>
-    </section>
-
-    <section>
-      <h2>3️⃣ Canto pulido (opcional)</h2>
-      <label><input type="checkbox" id="chkCanto" onchange="toggleCanto()"> Añadir canto pulido</label>
-      <div id="cantoContainer" style="display:none;">
-        <label>Lados anchos:</label><input type="number" id="ladosAnchos" min="0" max="2" value="0" />
-        <label>Lados largos:</label><input type="number" id="ladosLargos" min="0" max="2" value="0" />
-        <label>Precio por metro lineal (€):</label><input type="number" id="precioCanto" step="0.1" value="5" />
-        <button onclick="calcularCanto()">Calcular canto</button>
-        <div id="resultadoCanto"></div>
-      </div>
-    </section>
-
-    <section>
-      <h2>4️⃣ Resumen</h2>
-      <button onclick="mostrarResumen()">Mostrar resumen</button>
-      <div id="resumen"></div>
-    </section>
-  </div>
-
-  <script src="script.js" defer></script>
+  <script src="script.js"></script>
 </body>
 </html>
