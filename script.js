@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function checkPassword(){
     const input = passInput.value.trim();
-    const real  = atob("MTIz"); // "123" en Base64
+    const real  = atob("MTIz"); // "123"
     if (input === real){
       sessionStorage.setItem("logged","true");
       loginDiv.style.display = "none";
@@ -31,13 +31,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+
 function initApp(){
-  // Botones y secciones
   const btnManual = document.getElementById("btnManual");
   const btnTarifa = document.getElementById("btnTarifa");
   const manualDiv = document.getElementById("manual");
   const tarifaDiv = document.getElementById("tarifa");
+  const vidrioSelect = document.getElementById("vidrioSelect");
 
+  let multiplos = [];
+  let tarifa = [];
+  let presupuestos = []; // 👈 varios vidrios
+
+  // === Modo de visualización ===
   btnManual.addEventListener("click", () => setMode("manual"));
   btnTarifa.addEventListener("click", () => setMode("tarifa"));
 
@@ -55,12 +61,7 @@ function initApp(){
     document.getElementById("resultadoTarifa").innerHTML = "";
   }
 
-  // Datos
-  const vidrioSelect = document.getElementById("vidrioSelect");
-  let multiplos = [];
-  let tarifa    = [];
-
-  // 1) Cargar múltiplos (lista de m² ascendentes: 0.06, 0.12, ...)
+  // === Cargar múltiplos ===
   fetch("multiplos.csv")
     .then(r => r.text())
     .then(text => {
@@ -72,34 +73,36 @@ function initApp(){
     })
     .catch(() => console.warn("No se pudo cargar multiplos.csv"));
 
-  // 2) Cargar tarifa (SEPARADOR ';' FIJO + decimales con coma)
+  // === Cargar tarifa Mapfre (CSV real con 4 columnas: Código, Unidad, Descripción, Precio (€)) ===
   fetch("tarifa_mapfre_completa.csv")
     .then(r => r.text())
     .then(text => {
       const lineas = text.trim().split(/\r?\n/);
       vidrioSelect.innerHTML = "";
       tarifa = [];
-      // Esperamos formato: NOMBRE;PRECIO;CANTO
-      lineas.forEach((linea, i) => {
-        if (!linea.trim()) return;
-        if (i === 0 && /nombre/i.test(linea)) return; // cabecera
-        const cols = linea.split(";"); // muy importante: SOLO ';'
-        const nombre = (cols[0] || "").trim();
-        const precio = parseFloat((cols[1] || "0").replace(",", ".")) || 0;
-        const canto  = parseFloat((cols[2] || "0").replace(",", ".")) || 0;
 
-        if (!nombre) return;
-        tarifa.push({ nombre, precio, canto });
+      lineas.forEach((linea, i) => {
+        if (i === 0) return; // saltar cabecera
+        const cols = linea.split(","); // separador coma
+        if (cols.length < 4) return;
+
+        const codigo = cols[0].trim();
+        const unidad = cols[1].trim();
+        const descripcion = cols[2].replace(/^m2\.?\s*/i, "").trim(); // eliminar "m2." del principio
+        const precio = parseFloat(cols[3].replace(/[^\d.,-]/g, "").replace(",", ".")) || 0;
+
+        if (!descripcion || precio <= 0) return;
+        tarifa.push({ codigo, unidad, descripcion, precio });
 
         const opt = document.createElement("option");
-        opt.value = JSON.stringify({ precio, canto });
-        opt.textContent = `${nombre} — ${precio.toFixed(2)} €/m²`;
+        opt.value = JSON.stringify({ codigo, unidad, precio });
+        opt.textContent = `${descripcion} — ${precio.toFixed(2)} €/m²`;
         vidrioSelect.appendChild(opt);
       });
     })
     .catch(() => console.warn("No se pudo cargar tarifa_mapfre_completa.csv"));
 
-  // Utilidades
+  // === Funciones útiles ===
   const ajustarPorTabla = (m2) => {
     if (!multiplos.length) return Math.ceil(m2 * 100) / 100;
     for (const m of multiplos){ if (m2 <= m) return m; }
@@ -107,11 +110,9 @@ function initApp(){
   };
   const aplicarMargen = (precio, margen) => margen ? precio * (1 + margen/100) : precio;
 
-  // MANUAL
+  // === Eventos de botones ===
   document.getElementById("btnCalcularManual").addEventListener("click", () => calcular("manual"));
   document.getElementById("btnNuevoManual").addEventListener("click", () => clearInputs("manual"));
-
-  // TARIFA
   document.getElementById("btnCalcularTarifa").addEventListener("click", () => calcular("tarifa"));
   document.getElementById("btnNuevoTarifa").addEventListener("click", () => clearInputs("tarifa"));
 
@@ -125,64 +126,80 @@ function initApp(){
 
     let precioVidrio = 0;
     let precioCanto  = 0;
+    let tipoNombre   = "";
 
     if (isManual){
       precioVidrio = parseFloat(document.getElementById("precioManual").value) || 0;
       precioCanto  = parseFloat(document.getElementById("precioCantoM").value) || 0;
+      tipoNombre   = "Vidrio manual";
     } else {
-      const vidrio = JSON.parse(document.getElementById("vidrioSelect").value || "{}");
+      const opt = document.getElementById("vidrioSelect").selectedOptions[0];
+      const vidrio = opt ? JSON.parse(opt.value) : {};
+      tipoNombre   = opt ? opt.textContent.split("—")[0].trim() : "Vidrio tarifa";
       precioVidrio = parseFloat(vidrio.precio || 0) || 0;
-      precioCanto  = parseFloat(document.getElementById("precioCanto").value) || parseFloat(vidrio.canto || 0) || 0;
+      precioCanto  = parseFloat(document.getElementById("precioCanto").value) || 0;
     }
 
+    // Validación básica
     if (!ancho || !alto || !precioVidrio){
-      out.textContent = "Introduce todos los valores.";
+      out.textContent = "Introduce ancho, alto y tipo de vidrio.";
       return;
     }
 
-    // 1) Redondear CADA lado a múltiplos de 6 cm
+    // Cálculos principales
     const Ared = Math.ceil(ancho / 0.06) * 0.06;
     const Bred = Math.ceil(alto  / 0.06) * 0.06;
-
-    // 2) Área con lados ya redondeados + ajuste a tabla de múltiplos
     const areaLados = Ared * Bred;
     const m2Ajust   = ajustarPorTabla(areaLados);
-
-    // 3) Precio con margen
     const pVidrioFinal = aplicarMargen(precioVidrio, margen);
 
-    // 4) Cálculo de cantos (Ancho/Largo 1 ó 2)
+    // Cantos
     const a1 = document.getElementById(isManual ? "ancho1M":"ancho1").checked;
     const a2 = document.getElementById(isManual ? "ancho2M":"ancho2").checked;
     const l1 = document.getElementById(isManual ? "largo1M":"largo1").checked;
     const l2 = document.getElementById(isManual ? "largo2M":"largo2").checked;
 
     let ml = 0;
-    if (a1) ml += Ared;     // Ancho 1
-    if (a2) ml += 2*Ared;   // Ancho 2
-    if (l1) ml += Bred;     // Largo 1
-    if (l2) ml += 2*Bred;   // Largo 2
+    if (a1) ml += Ared;
+    if (a2) ml += Ared;
+    if (l1) ml += Bred;
+    if (l2) ml += Bred;
 
-    const costeCantos   = ml * precioCanto * uds;
-    const subtotalVid   = m2Ajust * pVidrioFinal * uds;
-    const subtotal      = subtotalVid + costeCantos;
-    const iva           = subtotal * 0.21;
-    const total         = subtotal + iva;
+    const costeCantos = ml * precioCanto * uds;
+    const subtotalVid = m2Ajust * pVidrioFinal * uds;
+    const subtotal    = subtotalVid + costeCantos;
+    const iva         = subtotal * 0.21;
+    const total       = subtotal + iva;
 
-    const titulo = isManual ? "Cálculo Manual"
-                            : document.getElementById("vidrioSelect").selectedOptions[0]?.textContent || "Vidrio por tarifa";
-
-    out.innerHTML = `
-      <b>${titulo}</b><br>
-      Medidas introducidas: ${ancho.toFixed(3)} × ${alto.toFixed(3)} m<br>
-      Medidas ajustadas: ${Ared.toFixed(2)} × ${Bred.toFixed(2)} m<br>
-      Superficie ajustada: ${m2Ajust.toFixed(2)} m²<br>
+    // Mostrar resultado
+    const texto = `
+      <b>${tipoNombre}</b><br>
+      Medidas: ${ancho.toFixed(2)} × ${alto.toFixed(2)} m<br>
+      Ajustadas: ${Ared.toFixed(2)} × ${Bred.toFixed(2)} m → ${m2Ajust.toFixed(2)} m²<br>
       Precio vidrio: ${pVidrioFinal.toFixed(2)} €/m²<br>
       Cantos: ${ml.toFixed(2)} m × ${precioCanto.toFixed(2)} € = ${costeCantos.toFixed(2)} €<br>
       Unidades: ${uds}<br>
       Subtotal: ${subtotal.toFixed(2)} €<br>
       IVA (21%): ${iva.toFixed(2)} €<br>
-      <b>Total: ${total.toFixed(2)} €</b>`;
+      <b>Total: ${total.toFixed(2)} €</b><hr>`;
+
+    out.innerHTML = texto;
+
+    // Guardar en lista de presupuestos
+    presupuestos.push({
+      tipo: tipoNombre,
+      ancho, alto, Ared, Bred,
+      m2Ajust, uds, precioVidrio, precioCanto, costeCantos, subtotal, iva, total
+    });
+
+    // Preguntar si quiere añadir otro vidrio
+    setTimeout(()=>{
+      if (confirm("¿Quieres añadir otro vidrio al presupuesto?")) {
+        clearInputs(mode);
+      } else {
+        mostrarPresupuestoFinal();
+      }
+    }, 200);
   }
 
   function clearInputs(mode){
@@ -193,15 +210,39 @@ function initApp(){
     clearResults();
   }
 
-  // Exportar PDF
+  function mostrarPresupuestoFinal(){
+    let totalFinal = 0;
+    let html = "<h3>Presupuesto completo</h3>";
+    presupuestos.forEach((p, i) => {
+      html += `<b>${i+1}. ${p.tipo}</b><br>
+      ${p.Ared.toFixed(2)} × ${p.Bred.toFixed(2)} m → ${p.m2Ajust.toFixed(2)} m²<br>
+      Subtotal: ${p.subtotal.toFixed(2)} € — IVA: ${p.iva.toFixed(2)} €<br>
+      <b>Total: ${p.total.toFixed(2)} €</b><hr>`;
+      totalFinal += p.total;
+    });
+    html += `<h2>Total general: ${totalFinal.toFixed(2)} €</h2>`;
+    document.getElementById("resultadoTarifa").innerHTML = html;
+  }
+
+  // === Exportar PDF ===
   document.getElementById("btnExportarPDF").addEventListener("click", ()=>{
     if (!window.jspdf){ alert("Falta jsPDF para exportar."); return; }
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const fecha = new Date().toLocaleDateString("es-ES");
-    const contenido = document.getElementById("resultadoManual").innerText
-                   || document.getElementById("resultadoTarifa").innerText
-                   || "Sin resultados para exportar.";
+
+    let contenido = "";
+    if (presupuestos.length > 0){
+      contenido = presupuestos.map((p,i)=>
+        `${i+1}. ${p.tipo}: ${p.m2Ajust.toFixed(2)} m² — ${p.total.toFixed(2)} €`
+      ).join("\n");
+      contenido += `\n\nTOTAL GENERAL: ${presupuestos.reduce((a,b)=>a+b.total,0).toFixed(2)} €`;
+    } else {
+      contenido = document.getElementById("resultadoManual").innerText
+               || document.getElementById("resultadoTarifa").innerText
+               || "Sin resultados para exportar.";
+    }
+
     doc.setFont("helvetica","bold"); doc.setFontSize(16);
     doc.text("Vidres Sosa - Presupuesto", 20, 20);
     doc.setFontSize(10); doc.text(`Fecha: ${fecha}`, 20, 28);
