@@ -1,96 +1,163 @@
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #e0e0e0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+/* ================================
+   VIDRES SOSA — ESTILO PRINCIPAL
+   ================================ */
+
+:root {
+  --verde-oscuro: #006e3b;
+  --verde-claro: #00a85a;
+  --gris-fondo: #f2f2f2;
+  --gris-texto: #333;
+  --blanco: #fff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
   margin: 0;
-  color: #333;
+  padding: 0;
+  height: 100%;
+  font-family: "Segoe UI", sans-serif;
+  background: var(--gris-fondo);
+  color: var(--gris-texto);
 }
 
-.card, .mode {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
-  text-align: center;
-  width: 90%;
-  max-width: 420px;
-  margin: 15px auto;
-  animation: fadeIn 0.3s ease;
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-.logo {
-  width: 120px;
-  margin-bottom: 10px;
-}
-
-.mode-selector {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.mode-selector button {
-  background: #006e3b;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  margin: 5px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.mode-selector button:hover {
-  background: #00994d;
-}
-
-.inputs {
-  text-align: left;
-  margin-bottom: 15px;
-}
-
-.inputs label {
+img {
+  max-width: 100%;
   display: block;
-  margin-top: 10px;
-  font-weight: bold;
 }
 
-.inputs input, select {
-  width: 100%;
-  padding: 8px;
-  border-radius: 5px;
+/* LOGIN */
+#login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+}
+
+.logo-login {
+  width: 120px;
+  margin-bottom: 15px;
+}
+
+#login input {
+  padding: 10px;
   border: 1px solid #ccc;
-  margin-top: 4px;
+  border-radius: 6px;
+  width: 220px;
+  text-align: center;
 }
 
-.mode button {
-  background: #006e3b;
-  color: white;
+#login button {
+  margin-top: 12px;
+  background: var(--verde-oscuro);
+  color: var(--blanco);
   border: none;
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
-  margin-top: 10px;
-  transition: 0.2s;
+  transition: background 0.3s;
 }
 
-.mode button:hover {
-  background: #00994d;
+#login button:hover {
+  background: var(--verde-claro);
 }
 
-.cantos {
+#error {
+  color: red;
   margin-top: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  font-weight: bold;
+}
+
+/* CABECERA */
+.header {
+  text-align: center;
+  padding: 15px 10px;
+  background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-claro));
+  color: var(--blanco);
+}
+
+.logo {
+  width: 100px;
+  margin: 0 auto 5px;
+}
+
+h1 {
+  margin: 5px 0 0 0;
+  font-size: 1.3em;
+}
+
+/* SECCIONES */
+.card, .mode {
+  background: var(--blanco);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 15px auto;
+  max-width: 480px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.mode-selector {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.mode-selector button {
+  flex: 1;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 0;
+  font-weight: bold;
+  background: var(--verde-oscuro);
+  color: var(--blanco);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.mode-selector button:hover {
+  background: var(--verde-claro);
+}
+
+.mode-selector button.active {
+  background: var(--verde-claro);
+}
+
+/* ENTRADAS */
+.inputs {
+  text-align: left;
+  margin-top: 10px;
+}
+
+.inputs label {
+  font-weight: bold;
+  display: block;
+  margin-top: 10px;
+}
+
+.inputs input, .inputs select {
+  width: 100%;
   padding: 8px;
-  background: #f9f9f9;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+}
+
+.info {
+  font-size: 0.9em;
+  color: #555;
+}
+
+/* CANTOS */
+.cantos {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fafafa;
+  padding: 10px;
+  margin-top: 12px;
 }
 
 .cantos label {
@@ -98,27 +165,96 @@ body {
   margin-right: 10px;
 }
 
+/* BOTONES */
+button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s, transform 0.1s;
+}
+
+button:hover {
+  transform: scale(1.02);
+}
+
+button.secondary {
+  background: #ddd;
+  color: #222;
+}
+
+button.secondary:hover {
+  background: #ccc;
+}
+
+.export-btn {
+  background: var(--verde-oscuro);
+  color: var(--blanco);
+  width: 100%;
+}
+
+.export-btn:hover {
+  background: var(--verde-claro);
+}
+
+/* RESULTADOS */
 .resultado {
   margin-top: 15px;
-  background: #f6f6f6;
+  background: #f9fff9;
+  border: 1px solid #cceacc;
   border-radius: 6px;
-  padding: 10px;
-  font-weight: bold;
-  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+  font-size: 0.95em;
+  font-weight: 500;
 }
 
-#error {
-  color: red;
-  margin-top: 10px;
+.resultado b {
+  color: var(--verde-oscuro);
 }
 
-.info {
-  font-size: 0.9em;
-  color: #555;
-  margin-bottom: 10px;
+/* ANIMACIONES */
+.fade-in {
+  animation: fadeIn 0.5s ease;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* EXPORTAR */
+.exportar {
+  max-width: 480px;
+  margin: 0 auto 30px;
+  text-align: center;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.1em;
+  }
+
+  .mode, .card {
+    padding: 18px;
+  }
+
+  .inputs input, .inputs select {
+    font-size: 1em;
+  }
+
+  .mode-selector button {
+    padding: 10px 0;
+    font-size: 0.9em;
+  }
 }

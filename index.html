@@ -2,56 +2,75 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Calculadora Vidres Sosa</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Login -->
-  <div id="login" class="card">
+  <!-- LOGIN -->
+  <div id="login" class="card fade-in">
+    <img src="logo.png" alt="Vidres Sosa" class="logo-login">
     <h2>Acceso</h2>
     <input type="password" id="password" placeholder="Introduce la contraseña">
-    <button onclick="checkPassword()">Entrar</button>
+    <button id="btnLogin">Entrar</button>
     <p id="error"></p>
   </div>
 
-  <!-- App -->
+  <!-- APLICACIÓN PRINCIPAL -->
   <div id="app" style="display:none;">
     <header class="header">
       <img src="logo.png" alt="Vidres Sosa" class="logo">
-      <h1>Calculadora de Precios</h1>
+      <h1>Calculadora de Vidrios</h1>
     </header>
 
+    <!-- Selector de modo -->
     <section class="mode-selector">
-      <button onclick="setMode('manual')" id="btnManual">Modo Manual</button>
-      <button onclick="setMode('tarifa')" id="btnTarifa">Modo Tarifa</button>
+      <button id="btnManual" class="active">Modo Manual</button>
+      <button id="btnTarifa">Modo Tarifa</button>
     </section>
 
-    <!-- Manual -->
+    <!-- Sección modo manual -->
     <section id="manual" class="mode">
       <h3>Cálculo Manual</h3>
       <p class="info">Introduce las medidas en metros (ej. 1.34 = 1 m 34 cm)</p>
+
       <div class="inputs">
         <label>Ancho (m)</label>
         <input type="number" id="anchoManual" step="0.01" placeholder="Ej. 1.20">
+
         <label>Alto (m)</label>
         <input type="number" id="altoManual" step="0.01" placeholder="Ej. 0.80">
+
+        <label>Unidades</label>
+        <input type="number" id="unidadesManual" step="1" min="1" value="1">
+
         <label>Precio €/m²</label>
         <input type="number" id="precioManual" step="0.01" placeholder="Ej. 45">
+
+        <label>Margen de beneficio (%)</label>
+        <input type="number" id="margenManual" step="1" placeholder="Ej. 20">
       </div>
-      <button onclick="calcularManual()">Calcular</button>
+
+      <button id="btnCalcularManual">Calcular</button>
+      <button id="btnNuevoManual" class="secondary">Nuevo cálculo</button>
       <div id="resultadoManual" class="resultado"></div>
     </section>
 
-    <!-- Tarifa -->
+    <!-- Sección modo tarifa -->
     <section id="tarifa" class="mode" style="display:none;">
       <h3>Cálculo por Tarifa Mapfre</h3>
       <p class="info">Introduce las medidas en metros (ej. 1.34 = 1 m 34 cm)</p>
+
       <div class="inputs">
         <label>Ancho (m)</label>
         <input type="number" id="anchoTarifa" step="0.01" placeholder="Ej. 1.20">
+
         <label>Alto (m)</label>
         <input type="number" id="altoTarifa" step="0.01" placeholder="Ej. 0.80">
+
+        <label>Unidades</label>
+        <input type="number" id="unidadesTarifa" step="1" min="1" value="1">
+
         <label>Tipo de vidrio</label>
         <select id="vidrioSelect"></select>
 
@@ -63,12 +82,22 @@
           <label><input type="checkbox" id="cantoAba"> Abajo</label>
         </div>
 
-        <label>Precio canto pulido (€)</label>
+        <label>Precio canto pulido (€ por metro)</label>
         <input type="number" id="precioCanto" step="0.01" placeholder="Ej. 3.00">
+
+        <label>Margen de beneficio (%)</label>
+        <input type="number" id="margenTarifa" step="1" placeholder="Ej. 20">
       </div>
-      <button onclick="calcularTarifa()">Calcular</button>
+
+      <button id="btnCalcularTarifa">Calcular</button>
+      <button id="btnNuevoTarifa" class="secondary">Nuevo cálculo</button>
       <div id="resultadoTarifa" class="resultado"></div>
     </section>
+
+    <!-- Botón de exportación -->
+    <div class="exportar">
+      <button id="btnExportarPDF" class="export-btn">Descargar presupuesto en PDF</button>
+    </div>
   </div>
 
   <script src="script.js"></script>
