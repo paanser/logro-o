@@ -1,105 +1,105 @@
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
-  color: #333;
+  font-family: 'Segoe UI', sans-serif;
+  background: #eaeaea;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
-  flex-direction: column;
+  color: #333;
 }
 
-.centered {
-  text-align: center;
+.card, .mode {
   background: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-#login input {
-  padding: 10px;
-  font-size: 16px;
-  margin: 10px;
-  width: 220px;
-}
-
-#login button {
-  padding: 10px 20px;
-  background: #444;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-#error {
-  color: red;
-  font-size: 14px;
-  margin-top: 10px;
-}
-
-#app {
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
   text-align: center;
-  width: 100%;
-  max-width: 450px;
+  width: 90%;
+  max-width: 400px;
+  margin: 15px auto;
+  animation: fadeIn 0.3s ease;
 }
 
-header {
-  background: #ddd;
-  padding: 20px;
-  border-radius: 8px 8px 0 0;
-  margin-bottom: 20px;
+.header {
+  text-align: center;
+  margin-bottom: 15px;
 }
 
 .logo {
   width: 120px;
-  margin: 0 auto 10px auto;
-  display: block;
+  margin-bottom: 10px;
 }
 
 .mode-selector {
+  text-align: center;
   margin-bottom: 20px;
 }
 
 .mode-selector button {
-  background: #666;
+  background: #444;
   color: white;
   border: none;
   padding: 10px 15px;
   margin: 5px;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: 0.2s;
 }
 
-.mode {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+.mode-selector button:hover {
+  background: #008cba;
 }
 
-.mode input {
+.inputs {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.inputs label {
   display: block;
-  width: 90%;
-  margin: 8px auto;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.inputs input {
+  width: 100%;
   padding: 8px;
-  border: 1px solid #ccc;
   border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-top: 4px;
 }
 
 .mode button {
-  background: #008cba;
+  background: #007b9e;
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
+  margin-top: 10px;
+  transition: 0.2s;
+}
+
+.mode button:hover {
+  background: #009ed4;
+}
+
+.resultado {
+  margin-top: 15px;
+  background: #f6f6f6;
+  border-radius: 6px;
+  padding: 10px;
+  font-weight: bold;
+  border: 1px solid #ddd;
+}
+
+#error {
+  color: red;
   margin-top: 10px;
 }
 
-p {
-  font-weight: bold;
-  margin-top: 15px;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
