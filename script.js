@@ -43,11 +43,12 @@ function cargarTarifa() {
         if (i > 0) {
           const columnas = linea.split(';');
           const nombre = columnas[0];
-          const precio = parseFloat(columnas[columnas.length - 1].replace(',', '.'));
-          tarifa.push({ nombre, precio });
+          const precio = parseFloat(columnas[columnas.length - 2].replace(',', '.')) || 0;
+          const canto = parseFloat(columnas[columnas.length - 1].replace(',', '.')) || 0;
+          tarifa.push({ nombre, precio, canto });
           const option = document.createElement('option');
-          option.value = precio;
-          option.textContent = nombre;
+          option.value = JSON.stringify({ precio, canto });
+          option.textContent = `${nombre} — ${precio.toFixed(2).replace('.', ',')} €/m²`;
           select.appendChild(option);
         }
       });
@@ -74,20 +75,34 @@ function calcularManual() {
 
   let area = ancho * alto;
   let ajustado = ajustarMultiplos(area);
-  const total = ajustado * precio;
+  const subtotal = ajustado * precio;
+  const iva = subtotal * 0.21;
+  const total = subtotal + iva;
 
   resultado.innerHTML = `
     Medidas: ${ancho.toFixed(2)} × ${alto.toFixed(2)} m = ${area.toFixed(2)} m²<br>
     Superficie ajustada: <b>${ajustado.toFixed(2)} m²</b><br>
-    Precio unitario: <b>${precio.toFixed(2)} €/m²</b><br>
-    Total: <b>${total.toFixed(2)} €</b>`;
+    Precio unitario: <b>${precio.toFixed(2).replace('.', ',')} €/m²</b><br>
+    Subtotal: <b>${subtotal.toFixed(2).replace('.', ',')} €</b><br>
+    IVA (21%): <b>${iva.toFixed(2).replace('.', ',')} €</b><br>
+    Total: <b>${total.toFixed(2).replace('.', ',')} €</b>`;
 }
 
 function calcularTarifa() {
   const ancho = parseFloat(document.getElementById('anchoTarifa').value) || 0;
   const alto = parseFloat(document.getElementById('altoTarifa').value) || 0;
-  const precio = parseFloat(document.getElementById('vidrioSelect').value) || 0;
-  const nombreVidrio = document.getElementById('vidrioSelect').selectedOptions[0].textContent;
+  const vidrio = JSON.parse(document.getElementById('vidrioSelect').value);
+  const precio = vidrio.precio;
+  const cantoTarifa = vidrio.canto;
+  const precioCantoManual = parseFloat(document.getElementById('precioCanto').value) || cantoTarifa || 0;
+
+  const cantosSeleccionados = [
+    document.getElementById('cantoIzq').checked,
+    document.getElementById('cantoDer').checked,
+    document.getElementById('cantoArr').checked,
+    document.getElementById('cantoAba').checked
+  ].filter(Boolean).length;
+
   const resultado = document.getElementById('resultadoTarifa');
 
   if (!ancho || !alto || !precio) {
@@ -97,12 +112,19 @@ function calcularTarifa() {
 
   let area = ancho * alto;
   let ajustado = ajustarMultiplos(area);
-  const total = ajustado * precio;
+  const subtotalVidrio = ajustado * precio;
+  const subtotalCantos = cantosSeleccionados * precioCantoManual;
+  const subtotal = subtotalVidrio + subtotalCantos;
+  const iva = subtotal * 0.21;
+  const total = subtotal + iva;
 
   resultado.innerHTML = `
-    Vidrio: <b>${nombreVidrio}</b><br>
+    Vidrio: <b>${document.getElementById('vidrioSelect').selectedOptions[0].textContent}</b><br>
     Medidas: ${ancho.toFixed(2)} × ${alto.toFixed(2)} m = ${area.toFixed(2)} m²<br>
     Superficie ajustada: <b>${ajustado.toFixed(2)} m²</b><br>
-    Precio tarifa: <b>${precio.toFixed(2)} €/m²</b><br>
-    Total: <b>${total.toFixed(2)} €</b>`;
+    Precio m²: <b>${precio.toFixed(2).replace('.', ',')} €/m²</b><br>
+    Cantos pulidos: <b>${cantosSeleccionados}</b> × ${precioCantoManual.toFixed(2).replace('.', ',')} € = <b>${subtotalCantos.toFixed(2).replace('.', ',')} €</b><br>
+    Subtotal: <b>${subtotal.toFixed(2).replace('.', ',')} €</b><br>
+    IVA (21%): <b>${iva.toFixed(2).replace('.', ',')} €</b><br>
+    Total: <b>${total.toFixed(2).replace('.', ',')} €</b>`;
 }

@@ -85,6 +85,19 @@ body {
   background: #00994d;
 }
 
+.cantos {
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 8px;
+  background: #f9f9f9;
+}
+
+.cantos label {
+  display: inline-block;
+  margin-right: 10px;
+}
+
 .resultado {
   margin-top: 15px;
   background: #f6f6f6;
