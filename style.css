@@ -1,5 +1,5 @@
 /* ================================
-   VIDRES SOSA — ESTILO PRINCIPAL
+   VIDRES SOSA — ESTILO FINAL V3
    ================================ */
 
 :root {
@@ -23,11 +23,6 @@ html, body {
   color: var(--gris-texto);
 }
 
-img {
-  max-width: 100%;
-  display: block;
-}
-
 /* LOGIN */
 #login {
   display: flex;
@@ -38,7 +33,7 @@ img {
 }
 
 .logo-login {
-  width: 120px;
+  width: 130px;
   margin-bottom: 15px;
 }
 
@@ -138,7 +133,8 @@ h1 {
   margin-top: 10px;
 }
 
-.inputs input, .inputs select {
+.inputs input,
+.inputs select {
   width: 100%;
   padding: 8px;
   border-radius: 5px;
@@ -158,6 +154,11 @@ h1 {
   background: #fafafa;
   padding: 10px;
   margin-top: 12px;
+}
+
+.cantos p {
+  margin-top: 0;
+  font-weight: bold;
 }
 
 .cantos label {
