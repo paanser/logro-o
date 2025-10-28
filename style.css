@@ -1,100 +1,107 @@
-/* =======================================
-   VIDRES SOSA — ESTILO FINAL V5
-   ======================================= */
+/* === VIDRES SOSA — ESTILO PRINCIPAL v9.0 === */
 
-:root {
-  --verde-oscuro: #006e3b;
-  --verde-claro: #00a85a;
-  --gris-fondo: #f5f5f5;
-  --gris-texto: #333;
-  --blanco: #fff;
-}
-
+/* Reset básico */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  font-family: "Segoe UI", Roboto, sans-serif;
-  background: var(--gris-fondo);
-  color: var(--gris-texto);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f7f7f7;
+  color: #222;
+  line-height: 1.5;
 }
 
-/* LOGIN */
+/* ---------- LOGIN ---------- */
 #login {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  height: 100dvh;
-  background: var(--gris-fondo);
+  align-items: center;
+  background: linear-gradient(180deg, #f9f9f9 0%, #e9e9e9 100%);
+  animation: fadeSlideIn 0.4s ease-out;
+  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
 }
 
-.logo-login {
-  width: 130px;
-  margin-bottom: 15px;
+#login.hidden {
+  opacity: 0;
+  transform: translateY(-40px);
+  pointer-events: none;
+  visibility: hidden;
 }
 
-#login input {
+#login h2 {
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  color: #333;
+}
+
+#login input[type="password"] {
   padding: 10px;
-  border: 1px solid #ccc;
   border-radius: 6px;
-  width: 230px;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+  width: 220px;
+  font-size: 1rem;
   text-align: center;
-  font-size: 1em;
 }
 
-#login button {
-  margin-top: 12px;
-  background: var(--verde-oscuro);
-  color: var(--blanco);
+#btnLogin {
+  margin-top: 10px;
+  background: #006c3b;
+  color: #fff;
   border: none;
-  padding: 10px 22px;
   border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 1rem;
   cursor: pointer;
   transition: background 0.3s;
 }
 
-#login button:hover {
-  background: var(--verde-claro);
+#btnLogin:hover {
+  background: #00934f;
 }
 
-#error {
-  color: red;
-  margin-top: 8px;
-  font-weight: bold;
+#login p#error {
+  color: #c00;
+  margin-top: 10px;
+  font-weight: 500;
 }
 
-/* CABECERA */
+/* ---------- APP PRINCIPAL ---------- */
+#app {
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+}
+
+#app:not(.hidden) {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Cabecera */
 .header {
+  background: linear-gradient(90deg, #006c3b 0%, #009e50 100%);
+  color: white;
   text-align: center;
-  padding: 15px;
-  background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-claro));
-  color: var(--blanco);
+  padding: 1.2rem;
 }
 
-.logo {
-  width: 100px;
-  margin-bottom: 5px;
+.header img.logo {
+  width: 80px;
+  display: block;
+  margin: 0 auto 0.5rem auto;
 }
 
-h1 {
-  margin: 5px 0;
-  font-size: 1.4em;
-}
-
-/* CONTENEDOR PRINCIPAL */
-.mode, .card {
-  background: var(--blanco);
-  border-radius: 10px;
-  padding: 20px;
-  margin: 15px auto;
-  max-width: 480px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
-}
-
-/* BOTONES DE MODO */
+/* Modo selector */
 .mode-selector {
   display: flex;
   justify-content: center;
@@ -103,143 +110,129 @@ h1 {
 }
 
 .mode-selector button {
-  flex: 1;
+  background: #009e50;
+  color: #fff;
   border: none;
+  padding: 10px 20px;
   border-radius: 6px;
-  padding: 10px 0;
-  font-weight: bold;
-  background: var(--verde-oscuro);
-  color: var(--blanco);
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-}
-
-.mode-selector button:hover {
-  background: var(--verde-claro);
+  font-weight: 600;
 }
 
 .mode-selector button.active {
-  background: var(--verde-claro);
+  background: #00773d;
 }
 
-/* FORMULARIOS */
+.mode-selector button:hover {
+  background: #008e48;
+}
+
+/* Inputs */
 .inputs {
-  text-align: left;
-  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .inputs label {
-  font-weight: bold;
-  display: block;
-  margin-top: 10px;
+  font-weight: 600;
+  color: #333;
 }
 
 .inputs input,
 .inputs select {
-  width: 100%;
   padding: 8px;
-  border-radius: 5px;
   border: 1px solid #ccc;
-  margin-top: 5px;
-  font-size: 1em;
-}
-
-.info {
-  font-size: 0.9em;
-  color: #555;
-}
-
-/* CANTOS */
-.cantos {
-  border: 1px solid #ddd;
   border-radius: 6px;
-  background: #fafafa;
-  padding: 10px;
-  margin-top: 12px;
 }
 
-.cantos p {
-  margin-top: 0;
-  font-weight: bold;
+/* Acciones */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
 }
 
-.cantos label {
-  display: inline-block;
-  width: 48%;
-  margin-bottom: 5px;
-}
-
-/* BOTONES */
-button {
-  margin-top: 10px;
-  padding: 10px 18px;
+.actions button {
+  padding: 10px 20px;
   border-radius: 6px;
   border: none;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s, transform 0.1s;
 }
 
-button:hover {
-  transform: scale(1.03);
-}
-
-button.secondary {
-  background: #ddd;
-  color: #222;
-}
-
-button.secondary:hover {
+.actions button.secondary {
   background: #ccc;
 }
 
+.actions button:not(.secondary) {
+  background: #00773d;
+  color: #fff;
+}
+
+/* Resultados */
+.resultado {
+  margin: 20px auto;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+}
+
+.bloque-vidrio {
+  padding: 5px 0;
+}
+
+.exportar {
+  text-align: center;
+  margin: 20px 0;
+}
+
 .export-btn {
-  background: var(--verde-oscuro);
-  color: var(--blanco);
-  width: 100%;
+  background: #00773d;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
 .export-btn:hover {
-  background: var(--verde-claro);
+  background: #009e50;
 }
 
-/* RESULTADOS */
-.resultado {
-  margin-top: 15px;
-  background: #f9fff9;
-  border: 1px solid #cceacc;
-  border-radius: 6px;
-  padding: 12px;
-  text-align: left;
-  font-size: 0.95em;
-  font-weight: 500;
-}
-
-.resultado b {
-  color: var(--verde-oscuro);
-}
-
-/* EXPORTAR */
-.exportar {
-  max-width: 480px;
-  margin: 0 auto 30px;
+/* Footer */
+.footer {
   text-align: center;
+  padding: 10px;
+  font-size: 0.9rem;
+  color: #555;
 }
 
-/* ANIMACIÓN */
-.fade-in {
-  animation: fadeIn 0.5s ease;
+/* Cerrar sesión */
+.logout-btn {
+  background: #d9534f !important;
+  color: #fff !important;
+  font-weight: 600;
 }
 
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(10px);}
-  to {opacity: 1; transform: translateY(0);}
+.logout-btn:hover {
+  background: #b52b27 !important;
 }
 
-/* RESPONSIVE */
-@media (max-width: 600px) {
-  h1 { font-size: 1.2em; }
-  .mode, .card { padding: 16px; }
-  .mode-selector button { font-size: 0.9em; }
-  .inputs input, .inputs select { font-size: 1em; }
+/* --- Animaciones --- */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
