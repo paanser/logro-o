@@ -1,4 +1,4 @@
-/* VIDRES SOSA — SCRIPT PRINCIPAL v9.0 (login 100% estable + botón cerrar sesión) */
+/* VIDRES SOSA — SCRIPT PRINCIPAL v9.1 (animación + cierre sesión con foco) */
 (() => {
   const nfCurrency = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
   const nfNumber = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -11,7 +11,6 @@
   let listaPresupuesto = [];
   let appInitialized = false;
 
-  // Forzar inicio aunque defer falle (Safari iOS)
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initLogin);
   } else {
@@ -19,25 +18,18 @@
   }
 
   function initLogin() {
-    console.log("✅ Login cargado");
     const loginDiv = document.getElementById("login");
     const appDiv = document.getElementById("app");
     const btnLogin = document.getElementById("btnLogin");
     const passInput = document.getElementById("password");
     const errorMsg = document.getElementById("error");
 
-    if (!loginDiv || !btnLogin || !passInput) {
-      console.error("⚠️ No se encontraron los elementos del login.");
-      return;
-    }
+    if (!loginDiv || !btnLogin) return;
 
-    // Intentar restaurar sesión anterior
     let logged = false;
     try {
       logged = sessionStorage.getItem("logged") === "true";
-    } catch {
-      console.warn("sessionStorage no disponible");
-    }
+    } catch {}
 
     if (logged) {
       mostrarApp();
@@ -50,8 +42,6 @@
     function checkPassword() {
       const val = (passInput.value || "").trim();
       const real = atob("MTIz"); // "123"
-      console.log("Intento de login con:", val);
-
       if (!val) {
         errorMsg.textContent = "Introduce la contraseña.";
         return;
@@ -71,7 +61,6 @@
       appDiv.setAttribute("aria-hidden", "false");
       errorMsg.textContent = "";
 
-      // Crear botón Cerrar sesión
       if (!document.getElementById("btnLogout")) {
         const logout = document.createElement("button");
         logout.id = "btnLogout";
@@ -83,18 +72,18 @@
           appDiv.classList.add("hidden");
           appDiv.setAttribute("aria-hidden", "true");
           loginDiv.classList.remove("hidden");
+          loginDiv.style.animation = "fadeSlideIn 0.4s ease-out";
           loginDiv.setAttribute("aria-hidden", "false");
           passInput.value = "";
+          setTimeout(() => passInput.focus(), 200);
         });
         appDiv.prepend(logout);
       }
 
-      console.log("✅ Login correcto, iniciando app...");
       initAppOnce();
     }
   }
 
-  // ---------- Carga de múltiplos ----------
   async function loadMultiplosCSV(url) {
     try {
       const res = await fetch(url);
@@ -106,14 +95,11 @@
         .map(s => parseFloat(s.trim().replace(",", ".")))
         .filter(n => Number.isFinite(n))
         .sort((a, b) => a - b);
-      console.log("📄 Multiplos cargados:", multiplos.length);
-    } catch (err) {
-      console.warn("⚠️ No se pudo cargar multiplos.csv:", err);
+    } catch {
       multiplos = [];
     }
   }
 
-  // ---------- Inicialización única ----------
   function initAppOnce() {
     if (appInitialized) return;
     appInitialized = true;
@@ -121,9 +107,7 @@
     initApp();
   }
 
-  // ---------- APP PRINCIPAL ----------
   function initApp() {
-    console.log("✅ App iniciada");
     const btnManual = document.getElementById("btnManual");
     const btnTarifa = document.getElementById("btnTarifa");
     const manualDiv = document.getElementById("manual");
@@ -144,7 +128,6 @@
       btnTarifa.setAttribute("aria-pressed", !isManual);
     }
 
-    // Botones cálculo manual
     document.getElementById("btnCalcularManual").addEventListener("click", calcularManual);
     document.getElementById("btnNuevoManual").addEventListener("click", () => {
       document.querySelectorAll("#manual input").forEach(i => {
@@ -238,6 +221,4 @@
   }
 
   window.vidresSosaHelpers = { toNum, fmtMoney, fmtNum };
-})();
-
 })();
