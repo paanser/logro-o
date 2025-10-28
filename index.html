@@ -25,13 +25,14 @@
     <p id="error"></p>
   </div>
 
-  <!-- APP -->
+  <!-- APP PRINCIPAL -->
   <main id="app" class="hidden">
     <header class="header">
       <img src="logo.png" alt="Vidres Sosa" class="logo">
       <h1>Calculadora de Vidrios</h1>
     </header>
 
+    <!-- Selector de modo -->
     <section class="mode-selector">
       <button id="btnManual" class="active">Modo Manual</button>
       <button id="btnTarifa">Modo Tarifa</button>
@@ -43,13 +44,10 @@
       <div class="inputs">
         <label for="anchoManual">Ancho (m)</label>
         <input id="anchoManual" type="number" step="0.01">
-
         <label for="altoManual">Alto (m)</label>
         <input id="altoManual" type="number" step="0.01">
-
         <label for="unidadesManual">Unidades</label>
         <input id="unidadesManual" type="number" step="1" value="1">
-
         <label for="precioManual">Precio €/m²</label>
         <input id="precioManual" type="number" step="0.01">
 
