@@ -15,9 +15,7 @@
     function check() {
       const val = pass.value.trim();
       const real = atob('MTIz'); // contraseña "123"
-
       if (!val) { err.textContent = 'Introduce la contraseña.'; return; }
-
       if (val === real) {
         err.textContent = '';
         login.classList.add('hidden');
@@ -39,12 +37,16 @@
       tarifaDiv.classList.toggle('hidden', isManual);
       btnManual.classList.toggle('active', isManual);
       btnTarifa.classList.toggle('active', !isManual);
+      try { sessionStorage.setItem('modoVidresSosa', mode); } catch {}
     }
+
+    const savedMode = sessionStorage.getItem('modoVidresSosa') || 'manual';
+    setMode(savedMode);
 
     btnManual?.addEventListener('click', () => setMode('manual'));
     btnTarifa?.addEventListener('click', () => setMode('tarifa'));
 
-    // === BOTÓN PDF ===
+    // === GENERAR PDF VIDRES SOSA ===
     const btnPDF = document.getElementById('btnExportarPDF');
     btnPDF?.addEventListener('click', generarPDFVidresSosa);
 
@@ -71,14 +73,14 @@
         doc.setFontSize(11);
         doc.text(`Fecha presupuesto: ${fecha}`, 20, 40);
 
-        // Descripción o contenido
+        // Descripción
         doc.setFontSize(12);
         doc.text('Concepto:', 20, 55);
         doc.setFontSize(11);
         const texto = descripcion || '—';
         doc.text(texto, 20, 65, { maxWidth: 170 });
 
-        // Pie
+        // Pie de página
         doc.setFontSize(10);
         let y = 260;
         empresa.forEach(linea => {
