@@ -1,9 +1,7 @@
-/* === VIDRES SOSA — ESTILO PRINCIPAL === */
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
   background: #f7f7f7;
   color: #222;
-  line-height: 1.5;
   margin: 0;
   padding: 0;
 }
@@ -18,34 +16,6 @@ body {
 }
 
 .logo { width: 80px; margin-bottom: 0.5rem; }
-
-.inputs, .exportar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.inputs input, .inputs select, textarea {
-  width: 80%;
-  max-width: 400px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.actions button, .export-btn {
-  background: #00773d;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 20px;
-  cursor: pointer;
-}
-
-.actions button.secondary { background: #ccc; color: #000; }
-
-.export-btn:hover { background: #009e50; }
 
 .mode-selector {
   display: flex;
@@ -68,25 +38,70 @@ body {
   background: #00773d;
 }
 
+.inputs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.inputs input, .inputs select {
+  width: 80%;
+  max-width: 400px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.actions {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.actions button {
+  background: #00773d;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
 .resultado {
-  margin: 20px auto;
-  max-width: 500px;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  max-width: 500px;
+  margin: 20px auto;
   padding: 15px;
+}
+
+.exportar {
+  text-align: center;
+  margin: 20px 0;
 }
 
 #descripcionPresupuesto {
   width: 90%;
   max-width: 500px;
   min-height: 80px;
+  padding: 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  resize: vertical;
-  font-size: 1rem;
-  padding: 10px;
 }
+
+.export-btn {
+  background: #00773d;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.export-btn:hover { background: #009e50; }
 
 .footer {
   text-align: center;
