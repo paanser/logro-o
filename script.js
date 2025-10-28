@@ -1,4 +1,4 @@
-// ======== SCRIPT VIDRES SOSA CALCULADORA PRO ======== //
+// ======== SCRIPT VIDRES SOSA CALCULADORA PRO v1.1 ======== //
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnLogin.addEventListener("click", () => {
     if (passwordInput.value === "123") {
-      loginSection.classList.remove("active-section");
       loginSection.classList.add("hidden");
       menuSection.classList.remove("hidden");
       menuSection.classList.add("active-section");
@@ -24,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // --- BOTONES DEL MENÚ ---
+  // --- BOTONES DE NAVEGACIÓN ---
   const btnManual = document.getElementById("btnManual");
   const btnTarifa = document.getElementById("btnTarifa");
   const backToMenu1 = document.getElementById("backToMenu1");
@@ -35,16 +34,19 @@ document.addEventListener("DOMContentLoaded", () => {
     manualSection.classList.remove("hidden");
     manualSection.classList.add("active-section");
   });
+
   btnTarifa.addEventListener("click", () => {
     menuSection.classList.add("hidden");
     tarifaSection.classList.remove("hidden");
     tarifaSection.classList.add("active-section");
   });
+
   backToMenu1.addEventListener("click", () => {
     manualSection.classList.add("hidden");
     menuSection.classList.remove("hidden");
     menuSection.classList.add("active-section");
   });
+
   backToMenu2.addEventListener("click", () => {
     tarifaSection.classList.add("hidden");
     menuSection.classList.remove("hidden");
@@ -55,10 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnCalcularManual = document.getElementById("btnCalcularManual");
   const manualResultado = document.getElementById("manual-resultado");
   const btnPDFManual = document.getElementById("btnPDFManual");
-
   const ladoBtns = document.querySelectorAll(".lado-btn");
+
   let ladosActivos = [];
 
+  // Selección de lados de canto
   ladoBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       const lado = btn.dataset.lado;
@@ -72,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Calcular precio manual
   btnCalcularManual.addEventListener("click", () => {
     const ancho = parseFloat(document.getElementById("manual-ancho").value);
     const alto = parseFloat(document.getElementById("manual-alto").value);
@@ -84,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const areaM2 = Math.ceil(((ancho * alto) / 1000000) * 100) / 100; // m² redondeado
+    const areaM2 = Math.ceil(((ancho * alto) / 1000000) * 100) / 100; // m²
     const perimetroML = calcularPerimetro(ancho, alto, ladosActivos);
 
     const precioVidrio = areaM2 * precioM2;
@@ -122,19 +126,20 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch("tarifa_vidrios.csv").then(r => r.text()),
     fetch("tarifa_cantos.csv").then(r => r.text())
   ])
-  .then(([vidriosData, cantosData]) => {
-    tarifasVidrios = parseCSV(vidriosData);
-    tarifasCantos = parseCSV(cantosData);
-    actualizarSelectorVidrios(tarifasVidrios);
-  })
-  .catch(err => console.error("Error cargando tarifas:", err));
+    .then(([vidriosData, cantosData]) => {
+      tarifasVidrios = parseCSV(vidriosData);
+      tarifasCantos = parseCSV(cantosData);
+      actualizarSelectorVidrios(tarifasVidrios);
+    })
+    .catch(err => console.error("Error cargando tarifas:", err));
 
+  // Funciones CSV
   function parseCSV(text) {
     const lines = text.trim().split("\n").slice(1);
     const data = {};
     lines.forEach(line => {
       const [nombre, valor] = line.split(",");
-      data[nombre.trim()] = parseFloat(valor.trim());
+      data[nombre.trim()] = parseFloat(valor.replace(",", "."));
     });
     return data;
   }
@@ -195,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (l === "top" || l === "bottom") total += ancho;
       else if (l === "left" || l === "right") total += alto;
     });
-    return total / 1000; // ml
+    return total / 1000; // en ml
   }
 
   // ======== PDF ======== //
@@ -219,5 +224,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnPDFManual.addEventListener("click", () => generarPDF("manual"));
   btnPDFTarifa.addEventListener("click", () => generarPDF("tarifa"));
-
 });
