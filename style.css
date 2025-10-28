@@ -1,111 +1,258 @@
+/* ======== ESTILOS VIDRES SOSA CALCULADORA PRO ======== */
+
+:root {
+  --gris-fondo: #f2f2f2;
+  --verde-sosa: #2ecc71;
+  --rojo-sosa: #e74c3c;
+  --gris-oscuro: #333;
+  --blanco: #fff;
+  --fuente: 'Poppins', sans-serif;
+}
+
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f7f7f7;
-  color: #222;
+  font-family: var(--fuente);
+  background: var(--gris-fondo);
+  color: var(--gris-oscuro);
   margin: 0;
   padding: 0;
 }
 
-.hidden { display: none !important; }
+/* ======== SECCIONES ======== */
+.hidden { display: none; }
+.active-section { display: flex; }
 
-.header {
-  background: linear-gradient(90deg, #006c3b, #009e50);
-  color: white;
+section {
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  display: none;
+}
+
+#login-section.active-section,
+#menu-section.active-section,
+#manual-section.active-section,
+#tarifa-section.active-section {
+  display: flex;
+}
+
+/* ======== LOGIN ======== */
+.login-container {
+  background: var(--blanco);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
   text-align: center;
+  width: 320px;
+  animation: fadeIn 1s ease;
+}
+.logo-login {
+  width: 120px;
+  margin-bottom: 1rem;
+}
+.login-container h1 {
+  margin-bottom: 1rem;
+}
+.login-container input {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+.login-container button {
+  width: 100%;
+  padding: 0.6rem;
+  background: var(--verde-sosa);
+  border: none;
+  border-radius: 8px;
+  color: var(--blanco);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.login-container button:hover {
+  background: #27ae60;
+}
+.error {
+  color: var(--rojo-sosa);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* ======== HEADER ======== */
+.main-header, .sub-header {
+  background: var(--blanco);
+  width: 100%;
+  padding: 1rem 0;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.logo-header {
+  width: 50px;
+  vertical-align: middle;
+}
+.main-header h1 {
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: middle;
+  font-size: 1.5rem;
+}
+.sub-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 1rem;
 }
+.sub-header h2 { margin: 0 auto; }
+.back-btn {
+  background: var(--rojo-sosa);
+  border: none;
+  color: var(--blanco);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.back-btn:hover {
+  background: #c0392b;
+}
 
-.logo { width: 80px; margin-bottom: 0.5rem; }
+/* ======== MENÚ PRINCIPAL ======== */
+.menu-container {
+  background: var(--blanco);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+  text-align: center;
+}
+.menu-buttons button {
+  background: var(--verde-sosa);
+  color: var(--blanco);
+  border: none;
+  margin: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+}
+.menu-buttons button:hover {
+  background: #27ae60;
+  transform: scale(1.05);
+}
 
-.mode-selector {
+/* ======== FORMULARIOS ======== */
+.form-container {
+  background: var(--blanco);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  margin-top: 2rem;
+  max-width: 600px;
+  width: 90%;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem 1rem;
+  align-items: center;
+}
+.form-grid label {
+  text-align: right;
+  padding-right: 0.5rem;
+}
+.form-grid input, select {
+  width: 100%;
+  padding: 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.checkbox-group {
+  grid-column: span 2;
+  text-align: center;
+}
+
+/* ======== BOTONES ======== */
+.calc-btn, .pdf-btn {
+  background: var(--verde-sosa);
+  color: var(--blanco);
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 10px;
+  margin-top: 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  transition: background 0.3s;
+}
+.calc-btn:hover { background: #27ae60; }
+.pdf-btn {
+  background: var(--rojo-sosa);
+}
+.pdf-btn:hover { background: #c0392b; }
+
+/* ======== LADOS DE CANTO ======== */
+.lados-container {
+  grid-column: span 2;
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin: 15px 0;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
 }
-
-.mode-selector button {
-  background: #009e50;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.mode-selector button.active {
-  background: #00773d;
-}
-
-.inputs {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.inputs input, .inputs select {
-  width: 80%;
-  max-width: 400px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.actions {
-  text-align: center;
-  margin-top: 15px;
-}
-
-.actions button {
-  background: #00773d;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 20px;
-  cursor: pointer;
-}
-
-.resultado {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  max-width: 500px;
-  margin: 20px auto;
-  padding: 15px;
-}
-
-.exportar {
-  text-align: center;
-  margin: 20px 0;
-}
-
-#descripcionPresupuesto {
-  width: 90%;
-  max-width: 500px;
-  min-height: 80px;
-  padding: 10px;
+.lado-btn {
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-.export-btn {
-  background: #00773d;
-  color: #fff;
+  background: #ddd;
   border: none;
-  border-radius: 6px;
-  padding: 10px 20px;
-  margin-top: 10px;
   cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+.lado-btn.active {
+  background: var(--verde-sosa);
+  color: var(--blanco);
 }
 
-.export-btn:hover { background: #009e50; }
+/* ======== RESULTADOS ======== */
+.resultado {
+  background: #ecf0f1;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-weight: 500;
+  line-height: 1.6;
+  display: none;
+}
+.resultado.show { display: block; }
 
-.footer {
+/* ======== FOOTER ======== */
+footer {
   text-align: center;
-  padding: 10px;
+  padding: 1rem;
   font-size: 0.9rem;
-  color: #555;
+  color: #777;
+}
+
+/* ======== ANIMACIONES ======== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+  .form-grid label { text-align: left; }
+  .menu-buttons button {
+    width: 100%;
+  }
 }
