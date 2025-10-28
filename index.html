@@ -3,77 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Calculadora de vidrios para Vidres Sosa - cálculo manual o por tarifa con exportación a PDF.">
-  <title>Calculadora Vidres Sosa</title>
+  <meta name="description" content="Calculadora PRO de Vidres Sosa - Cálculo de vidrios y cantos pulidos.">
+  <title>Vidres Sosa Calculadora PRO</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
 
   <!-- LOGIN -->
-  <div id="login">
-    <img src="logo.png" alt="Vidres Sosa" class="logo-login">
-    <h2>Acceso</h2>
-    <input type="password" id="password" placeholder="Contraseña">
-    <button id="btnLogin">Entrar</button>
-    <p id="error"></p>
-  </div>
+  <section id="login-section" class="active-section">
+    <div class="login-container">
+      <img src="logo.png" alt="Vidres Sosa" class="logo-login">
+      <h1>Acceso Vidres Sosa</h1>
+      <input type="password" id="password" placeholder="Contraseña">
+      <button id="btnLogin">Entrar</button>
+      <p id="login-error" class="error"></p>
+    </div>
+  </section>
 
-  <!-- APLICACIÓN PRINCIPAL -->
-  <main id="app" class="hidden">
-    <header class="header">
-      <img src="logo.png" alt="Vidres Sosa" class="logo">
-      <h1>Calculadora de Vidrios</h1>
+  <!-- MENÚ PRINCIPAL -->
+  <section id="menu-section" class="hidden">
+    <header class="main-header">
+      <img src="logo.png" alt="Vidres Sosa" class="logo-header">
+      <h1>Calculadora PRO</h1>
     </header>
 
-    <!-- SELECTOR -->
-    <section class="mode-selector">
-      <button id="btnManual" class="active">Modo Manual</button>
-      <button id="btnTarifa">Modo Tarifa</button>
-    </section>
-
-    <!-- CONTENEDOR GENERAL -->
-    <section id="contenedorModo">
-      <!-- MODO MANUAL -->
-      <div id="manual" class="modo">
-        <h3>Cálculo Manual</h3>
-        <div class="inputs">
-          <label>Ancho (m)</label><input id="anchoManual" type="number" step="0.01">
-          <label>Alto (m)</label><input id="altoManual" type="number" step="0.01">
-          <label>Unidades</label><input id="unidadesManual" type="number" value="1">
-        </div>
-        <div class="actions">
-          <button id="btnCalcularManual">Calcular</button>
-        </div>
-        <div id="resultadoManual" class="resultado"></div>
+    <div class="menu-container">
+      <h2>Selecciona el modo de trabajo</h2>
+      <div class="menu-buttons">
+        <button id="btnManual">Cálculo Manual</button>
+        <button id="btnTarifa">Cálculo por Tarifa</button>
       </div>
-
-      <!-- MODO TARIFA -->
-      <div id="tarifa" class="modo hidden">
-        <h3>Cálculo por Tarifa Mapfre</h3>
-        <div class="inputs">
-          <label>Tipo de vidrio</label>
-          <select id="vidrioSelect">
-            <option>— Selecciona vidrio —</option>
-            <option>Laminado 3+3</option>
-            <option>Laminado 4+4</option>
-            <option>Templado 8 mm</option>
-          </select>
-        </div>
-        <div id="resultadoTarifa" class="resultado"></div>
-      </div>
-    </section>
-
-    <!-- EXPORTACIÓN -->
-    <div class="exportar">
-      <textarea id="descripcionPresupuesto" placeholder="Descripción del presupuesto..."></textarea>
-      <button id="btnExportarPDF" class="export-btn">Generar presupuesto PDF</button>
     </div>
+  </section>
 
-    <footer class="footer">
-      <p>© Vidres Sosa</p>
-    </footer>
-  </main>
+  <!-- MODO MANUAL -->
+  <section id="manual-section" class="hidden">
+    <header class="sub-header">
+      <button class="back-btn" id="backToMenu1">← Volver</button>
+      <h2>Cálculo Manual</h2>
+    </header>
+
+    <div class="form-container">
+      <div class="form-grid">
+        <label>Ancho (mm):</label><input type="number" id="manual-ancho">
+        <label>Alto (mm):</label><input type="number" id="manual-alto">
+        <label>Tipo de vidrio:</label><input type="text" id="manual-tipo" placeholder="Ej. 5+5 incoloro">
+        <label>Precio €/m²:</label><input type="number" id="manual-precio" step="0.01">
+
+        <label>Cantos pulidos:</label>
+        <div id="lados-selector" class="lados-container">
+          <button class="lado-btn" data-lado="top">↑</button>
+          <button class="lado-btn" data-lado="left">←</button>
+          <button class="lado-btn" data-lado="right">→</button>
+          <button class="lado-btn" data-lado="bottom">↓</button>
+        </div>
+
+        <label>Precio €/ml (manual):</label>
+        <input type="number" id="manual-canto-precio" step="0.01" placeholder="Ej. 5.00">
+      </div>
+
+      <button id="btnCalcularManual" class="calc-btn">Calcular Precio</button>
+
+      <div id="manual-resultado" class="resultado"></div>
+      <button id="btnPDFManual" class="pdf-btn hidden">Descargar PDF</button>
+    </div>
+  </section>
+
+  <!-- MODO TARIFA -->
+  <section id="tarifa-section" class="hidden">
+    <header class="sub-header">
+      <button class="back-btn" id="backToMenu2">← Volver</button>
+      <h2>Cálculo por Tarifa</h2>
+    </header>
+
+    <div class="form-container">
+      <div class="form-grid">
+        <label>Ancho (mm):</label><input type="number" id="tarifa-ancho">
+        <label>Alto (mm):</label><input type="number" id="tarifa-alto">
+        <label>Tipo de vidrio:</label>
+        <select id="tarifa-tipo"></select>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="usarCantosTarifa">
+          <label for="usarCantosTarifa">Incluir cantos pulidos por tarifa</label>
+        </div>
+      </div>
+
+      <button id="btnCalcularTarifa" class="calc-btn">Calcular Precio</button>
+
+      <div id="tarifa-resultado" class="resultado"></div>
+      <button id="btnPDFTarifa" class="pdf-btn hidden">Descargar PDF</button>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 Vidres Sosa · Calculadora PRO</p>
+  </footer>
+
 </body>
 </html>
