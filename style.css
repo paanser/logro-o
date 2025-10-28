@@ -1,4 +1,4 @@
-/* ======== ESTILOS VIDRES SOSA CALCULADORA PRO ======== */
+/* ======== ESTILOS VIDRES SOSA CALCULADORA PRO v1.1 ======== */
 
 :root {
   --gris-fondo: #f2f2f2;
@@ -15,25 +15,21 @@ body {
   color: var(--gris-oscuro);
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/* ======== SECCIONES ======== */
-.hidden { display: none; }
+.hidden { display: none !important; }
 .active-section { display: flex; }
 
 section {
-  min-height: 100vh;
+  display: none;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  display: none;
-}
-
-#login-section.active-section,
-#menu-section.active-section,
-#manual-section.active-section,
-#tarifa-section.active-section {
-  display: flex;
+  min-height: 100vh;
+  width: 100%;
 }
 
 /* ======== LOGIN ======== */
@@ -43,8 +39,8 @@ section {
   border-radius: 16px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.15);
   text-align: center;
-  width: 320px;
-  animation: fadeIn 1s ease;
+  width: 90%;
+  max-width: 360px;
 }
 .logo-login {
   width: 120px;
@@ -55,14 +51,14 @@ section {
 }
 .login-container input {
   width: 100%;
-  padding: 0.6rem;
+  padding: 0.7rem;
   margin-bottom: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
 }
 .login-container button {
   width: 100%;
-  padding: 0.6rem;
+  padding: 0.8rem;
   background: var(--verde-sosa);
   border: none;
   border-radius: 8px;
@@ -76,15 +72,13 @@ section {
 }
 .error {
   color: var(--rojo-sosa);
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
 }
 
 /* ======== HEADER ======== */
 .main-header, .sub-header {
   background: var(--blanco);
   width: 100%;
-  padding: 1rem 0;
+  padding: 1rem;
   text-align: center;
   box-shadow: 0 3px 10px rgba(0,0,0,0.1);
   position: sticky;
@@ -105,7 +99,6 @@ section {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
 }
 .sub-header h2 { margin: 0 auto; }
 .back-btn {
@@ -120,7 +113,7 @@ section {
   background: #c0392b;
 }
 
-/* ======== MENÚ PRINCIPAL ======== */
+/* ======== MENÚ ======== */
 .menu-container {
   background: var(--blanco);
   padding: 2rem;
@@ -196,12 +189,13 @@ section {
 }
 .pdf-btn:hover { background: #c0392b; }
 
-/* ======== LADOS DE CANTO ======== */
+/* ======== LADOS ======== */
 .lados-container {
   grid-column: span 2;
   display: flex;
   justify-content: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
   margin: 0.5rem 0;
 }
 .lado-btn {
@@ -237,12 +231,9 @@ footer {
   padding: 1rem;
   font-size: 0.9rem;
   color: #777;
-}
-
-/* ======== ANIMACIONES ======== */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  position: relative;
+  bottom: 0;
+  width: 100%;
 }
 
 /* ======== RESPONSIVE ======== */
@@ -252,7 +243,5 @@ footer {
     text-align: left;
   }
   .form-grid label { text-align: left; }
-  .menu-buttons button {
-    width: 100%;
-  }
+  .menu-buttons button { width: 100%; }
 }
