@@ -3,128 +3,148 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Calculadora de vidrios para Vidres Sosa - cálculo manual y por tarifa, con exportación a PDF.">
   <title>Calculadora Vidres Sosa</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Añadir integrity si se dispone del hash, y mantener crossorigin si se usa CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
 
+  <noscript>
+    <div class="noscript-warning">La aplicación necesita JavaScript habilitado para funcionar. Activa JavaScript en tu navegador.</div>
+  </noscript>
+
   <!-- LOGIN -->
-  <div id="login" class="card fade-in">
+  <div id="login" class="card fade-in" aria-hidden="false">
     <img src="logo.png" alt="Vidres Sosa" class="logo-login">
     <h2>Acceso</h2>
-    <input type="password" id="password" placeholder="Introduce la contraseña">
-    <button id="btnLogin">Entrar</button>
-    <p id="error"></p>
+
+    <label for="password">Contraseña</label>
+    <input type="password" id="password" name="password" placeholder="Introduce la contraseña" aria-describedby="error" inputmode="text">
+
+    <button type="button" id="btnLogin">Entrar</button>
+    <p id="error" role="alert" aria-live="assertive"></p>
   </div>
 
   <!-- APP PRINCIPAL -->
-  <div id="app" style="display:none;">
+  <main id="app" class="hidden" role="main" aria-hidden="true">
     <header class="header">
       <img src="logo.png" alt="Vidres Sosa" class="logo">
       <h1>Calculadora de Vidrios</h1>
     </header>
 
     <!-- Selector de modo -->
-    <section class="mode-selector">
-      <button id="btnManual" class="active">Modo Manual</button>
-      <button id="btnTarifa">Modo Tarifa</button>
+    <section class="mode-selector" aria-label="Selector de modo">
+      <button type="button" id="btnManual" class="active" aria-pressed="true">Modo Manual</button>
+      <button type="button" id="btnTarifa" aria-pressed="false">Modo Tarifa</button>
     </section>
 
     <!-- MODO MANUAL -->
-    <section id="manual" class="mode">
-      <h3>Cálculo Manual</h3>
+    <section id="manual" class="mode" aria-labelledby="manual-title">
+      <h3 id="manual-title">Cálculo Manual</h3>
       <p class="info">Introduce las medidas en metros (ej. 1.34 = 1 m 34 cm)</p>
 
       <div class="inputs">
-        <label>Ancho (m)</label>
-        <input type="number" id="anchoManual" step="0.01" placeholder="Ej. 1.20">
+        <label for="anchoManual">Ancho (m)</label>
+        <input id="anchoManual" name="anchoManual" type="number" step="0.01" inputmode="decimal" placeholder="Ej. 1.20" min="0" aria-required="true">
 
-        <label>Alto (m)</label>
-        <input type="number" id="altoManual" step="0.01" placeholder="Ej. 0.80">
+        <label for="altoManual">Alto (m)</label>
+        <input id="altoManual" name="altoManual" type="number" step="0.01" inputmode="decimal" placeholder="Ej. 0.80" min="0" aria-required="true">
 
-        <label>Unidades</label>
-        <input type="number" id="unidadesManual" step="1" min="1" value="1">
+        <label for="unidadesManual">Unidades</label>
+        <input id="unidadesManual" name="unidadesManual" type="number" step="1" min="1" value="1" inputmode="numeric">
 
-        <label>Precio €/m²</label>
-        <input type="number" id="precioManual" step="0.01" placeholder="Ej. 45">
+        <label for="precioManual">Precio €/m²</label>
+        <input id="precioManual" name="precioManual" type="number" step="0.01" inputmode="decimal" placeholder="Ej. 45" min="0">
 
-        <div class="cantos">
-          <p><b>Cantos pulidos</b></p>
-          <label><input type="checkbox" id="ancho1M"> Ancho 1</label>
-          <label><input type="checkbox" id="ancho2M"> Ancho 2</label><br>
-          <label><input type="checkbox" id="largo1M"> Largo 1</label>
-          <label><input type="checkbox" id="largo2M"> Largo 2</label>
-        </div>
+        <fieldset class="cantos" aria-labelledby="cantosManualLegend">
+          <legend id="cantosManualLegend"><b>Cantos pulidos</b></legend>
+          <label for="ancho1M"><input type="checkbox" id="ancho1M" name="ancho1M"> Ancho 1</label>
+          <label for="ancho2M"><input type="checkbox" id="ancho2M" name="ancho2M"> Ancho 2</label><br>
+          <label for="largo1M"><input type="checkbox" id="largo1M" name="largo1M"> Largo 1</label>
+          <label for="largo2M"><input type="checkbox" id="largo2M" name="largo2M"> Largo 2</label>
+        </fieldset>
 
-        <label>Precio canto pulido (€ por metro)</label>
-        <input type="number" id="precioCantoM" step="0.01" placeholder="Ej. 3.00">
+        <label for="precioCantoM">Precio canto pulido (€ por metro)</label>
+        <input id="precioCantoM" name="precioCantoM" type="number" step="0.01" inputmode="decimal" placeholder="Ej. 3.00" min="0">
 
-        <label>Margen de beneficio (%)</label>
-        <input type="number" id="margenManual" step="1" placeholder="Ej. 20">
+        <label for="margenManual">Margen de beneficio (%)</label>
+        <input id="margenManual" name="margenManual" type="number" step="1" inputmode="numeric" placeholder="Ej. 20" min="0">
       </div>
 
-      <button id="btnCalcularManual">Calcular</button>
-      <button id="btnNuevoManual" class="secondary">Nuevo cálculo</button>
-      <div id="resultadoManual" class="resultado"></div>
+      <div class="actions">
+        <button type="button" id="btnCalcularManual">Calcular</button>
+        <button type="button" id="btnNuevoManual" class="secondary">Nuevo cálculo</button>
+      </div>
+
+      <div id="resultadoManual" class="resultado" role="status" aria-live="polite" aria-atomic="true"></div>
     </section>
 
     <!-- MODO TARIFA -->
-    <section id="tarifa" class="mode" style="display:none;">
-      <h3>Cálculo por Tarifa Mapfre</h3>
+    <section id="tarifa" class="mode hidden" aria-labelledby="tarifa-title">
+      <h3 id="tarifa-title">Cálculo por Tarifa Mapfre</h3>
       <p class="info">Introduce las medidas en metros (ej. 1.34 = 1 m 34 cm)</p>
 
       <div class="inputs">
-        <label>Ancho (m)</label>
-        <input type="number" id="anchoTarifa" step="0.01" placeholder="Ej. 1.20">
+        <label for="anchoTarifa">Ancho (m)</label>
+        <input id="anchoTarifa" name="anchoTarifa" type="number" step="0.01" inputmode="decimal" placeholder="Ej. 1.20" min="0">
 
-        <label>Alto (m)</label>
-        <input type="number" id="altoTarifa" step="0.01" placeholder="Ej. 0.80">
+        <label for="altoTarifa">Alto (m)</label>
+        <input id="altoTarifa" name="altoTarifa" type="number" step="0.01" inputmode="decimal" placeholder="Ej. 0.80" min="0">
 
-        <label>Unidades</label>
-        <input type="number" id="unidadesTarifa" step="1" min="1" value="1">
+        <label for="unidadesTarifa">Unidades</label>
+        <input id="unidadesTarifa" name="unidadesTarifa" type="number" step="1" min="1" value="1" inputmode="numeric">
 
-        <label>Tipo de vidrio principal</label>
-        <select id="vidrioSelect"></select>
+        <label for="vidrioSelect">Tipo de vidrio principal</label>
+        <select id="vidrioSelect" name="vidrioSelect" aria-label="Tipo de vidrio principal"></select>
 
-        <label>Cambio de cara (opcional)</label>
-        <select id="vidrioSelect2">
+        <label for="vidrioSelect2">Cambio de cara (opcional)</label>
+        <select id="vidrioSelect2" name="vidrioSelect2" aria-label="Cambio de cara">
           <option value="0">— Sin cambio de cara —</option>
         </select>
 
-        <div class="cantos">
-          <p><b>Cantos pulidos</b></p>
-          <label><input type="checkbox" id="ancho1"> Ancho 1</label>
-          <label><input type="checkbox" id="ancho2"> Ancho 2</label><br>
-          <label><input type="checkbox" id="largo1"> Largo 1</label>
-          <label><input type="checkbox" id="largo2"> Largo 2</label>
-        </div>
+        <fieldset class="cantos" aria-labelledby="cantosTarifaLegend">
+          <legend id="cantosTarifaLegend"><b>Cantos pulidos</b></legend>
+          <label for="ancho1"><input type="checkbox" id="ancho1" name="ancho1"> Ancho 1</label>
+          <label for="ancho2"><input type="checkbox" id="ancho2" name="ancho2"> Ancho 2</label><br>
+          <label for="largo1"><input type="checkbox" id="largo1" name="largo1"> Largo 1</label>
+          <label for="largo2"><input type="checkbox" id="largo2" name="largo2"> Largo 2</label>
+        </fieldset>
 
-        <div class="canto-opciones">
+        <div class="canto-opciones" aria-label="Opciones de canto pulido">
           <p><b>Canto pulido</b></p>
-          <label><input type="checkbox" id="usarTarifaCanto"> Usar tarifa Mapfre</label>
-          <select id="cantoSelect">
+          <label for="usarTarifaCanto"><input type="checkbox" id="usarTarifaCanto" name="usarTarifaCanto"> Usar tarifa Mapfre</label>
+          <label for="cantoSelect" class="sr-only">Selecciona tipo de canto</label>
+          <select id="cantoSelect" name="cantoSelect">
             <option value="0">— Selecciona tipo de canto —</option>
           </select>
           <p>O introduce precio manual (€ por metro)</p>
-          <input type="number" id="precioCanto" step="0.01" placeholder="Ej. 3.00">
+          <label for="precioCanto">Precio canto (€ por metro)</label>
+          <input type="number" id="precioCanto" name="precioCanto" step="0.01" inputmode="decimal" placeholder="Ej. 3.00" min="0">
         </div>
 
-        <label>Margen de beneficio (%)</label>
-        <input type="number" id="margenTarifa" step="1" placeholder="Ej. 20">
+        <label for="margenTarifa">Margen de beneficio (%)</label>
+        <input id="margenTarifa" name="margenTarifa" type="number" step="1" inputmode="numeric" placeholder="Ej. 20" min="0">
       </div>
 
-      <button id="btnCalcularTarifa">Calcular</button>
-      <button id="btnNuevoTarifa" class="secondary">Nuevo cálculo</button>
-      <div id="resultadoTarifa" class="resultado"></div>
+      <div class="actions">
+        <button type="button" id="btnCalcularTarifa">Calcular</button>
+        <button type="button" id="btnNuevoTarifa" class="secondary">Nuevo cálculo</button>
+      </div>
+
+      <div id="resultadoTarifa" class="resultado" role="status" aria-live="polite" aria-atomic="true"></div>
     </section>
 
     <div class="exportar">
-      <button id="btnExportarPDF" class="export-btn">Descargar presupuesto en PDF</button>
+      <button type="button" id="btnExportarPDF" class="export-btn">Descargar presupuesto en PDF</button>
     </div>
-  </div>
 
-  <!-- Librería PDF y Script principal -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="script.js"></script>
+    <footer class="footer" role="contentinfo">
+      <p>© Vidres Sosa</p>
+    </footer>
+  </main>
+
 </body>
 </html>
