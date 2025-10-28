@@ -1,4 +1,4 @@
-/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
+v/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
 (() => {
   // Formateadores
   const nfCurrency = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
@@ -257,6 +257,9 @@
 
   // Exportar funciones públicas si se necesita (opcional)
   window.vidresSosaHelpers = {
+    toNum, fmtMoney, fmtNum
+  };
+})();
     toNum, fmtMoney, fmtNum
   };
 })();
