@@ -1,4 +1,4 @@
-v/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
+/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
 (() => {
   // Formateadores
   const nfCurrency = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
@@ -78,8 +78,6 @@ v/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
         .map(s => parseFloat(s.trim().replace(',', '.')))
         .filter(n => Number.isFinite(n))
         .sort((a, b) => a - b);
-      // Si quieres depurar:
-      // console.log('Multiplos cargados:', multiplos);
     } catch (err) {
       multiplos = [];
       console.warn('No se pudo cargar multiplos.csv:', err);
@@ -95,18 +93,17 @@ v/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
 
   // Lógica principal
   function initApp() {
-    // Elementos
     const btnManual = document.getElementById('btnManual');
     const btnTarifa = document.getElementById('btnTarifa');
     const manualDiv = document.getElementById('manual');
     const tarifaDiv = document.getElementById('tarifa');
-
     const outManual = document.getElementById('resultadoManual');
     const outTarifa = document.getElementById('resultadoTarifa');
 
-    // Cambiar modo (usar clases .hidden)
+    // Cambiar modo
     btnManual.addEventListener('click', () => setMode('manual'));
     btnTarifa.addEventListener('click', () => setMode('tarifa'));
+
     function setMode(mode) {
       const isManual = mode === 'manual';
       manualDiv.classList.toggle('hidden', !isManual);
@@ -117,7 +114,6 @@ v/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
       btnTarifa.setAttribute('aria-pressed', !isManual ? 'true' : 'false');
     }
 
-    // Auxiliares de cálculo
     const ajustarPorTabla = (m2) => {
       if (!multiplos || multiplos.length === 0) return round2(m2);
       for (const m of multiplos) if (m2 <= m) return m;
@@ -128,42 +124,29 @@ v/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
       return Number.isFinite(m) ? precio * (1 + m / 100) : precio;
     };
 
-    // Botones manual
     const btnCalcularManual = document.getElementById('btnCalcularManual');
     const btnNuevoManual = document.getElementById('btnNuevoManual');
 
     btnCalcularManual.addEventListener('click', () => {
       try {
-        // Leer inputs
         const ancho = toNum(document.getElementById('anchoManual').value);
         const alto = toNum(document.getElementById('altoManual').value);
-        const uds = Number.isInteger(parseInt(document.getElementById('unidadesManual').value, 10)) ? parseInt(document.getElementById('unidadesManual').value, 10) : 1;
+        const uds = parseInt(document.getElementById('unidadesManual').value, 10) || 1;
         const pBase = toNum(document.getElementById('precioManual').value);
         const pCanto = toNum(document.getElementById('precioCantoM').value) || 0;
         const margen = toNum(document.getElementById('margenManual').value) || 0;
 
-        if (!(Number.isFinite(ancho) && ancho > 0 && Number.isFinite(alto) && alto > 0)) {
-          alert('Introduce ancho y alto válidos (> 0).');
-          return;
-        }
-        if (!Number.isFinite(pBase) || pBase <= 0) {
-          alert('Introduce el precio €/m² del vidrio.');
-          return;
-        }
+        if (!(ancho > 0 && alto > 0)) return alert('Introduce ancho y alto válidos (> 0).');
+        if (!(pBase > 0)) return alert('Introduce el precio €/m² del vidrio.');
 
-        // Redondeo al escalón 0.06
         const Ared = round2(Math.ceil(ancho / 0.06) * 0.06);
         const Bred = round2(Math.ceil(alto / 0.06) * 0.06);
-
-        // Área ajustada mediante tabla de múltiplos
         const areaBruta = round2(Ared * Bred);
         const area = ajustarPorTabla(areaBruta);
 
-        // Precio vidrio con margen aplicado
         const pVidFinal = aplicarMargen(pBase, margen);
         const subtotalVid = round2(area * pVidFinal * uds);
 
-        // Cantos seleccionados (misma lógica previa: ancho checkbox suma Ared, largo suma Bred)
         const a1 = document.getElementById('ancho1M').checked;
         const a2 = document.getElementById('ancho2M').checked;
         const l1 = document.getElementById('largo1M').checked;
@@ -181,7 +164,6 @@ v/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
         const iva = round2(subtotal * 0.21);
         const total = round2(subtotal + iva);
 
-        // Construir bloque resultado de manera segura
         const bloque = document.createElement('div');
         bloque.className = 'bloque-vidrio';
         bloque.innerHTML = `
@@ -193,13 +175,8 @@ v/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
           Subtotal: ${fmtMoney(subtotal)} — IVA (21%): ${fmtMoney(iva)}<br>
           <b>Total: ${fmtMoney(total)}</b>
         `;
-        // Separador
-        const hr = document.createElement('hr');
+        outManual.append(bloque, document.createElement('hr'));
 
-        outManual.appendChild(bloque);
-        outManual.appendChild(hr);
-
-        // Añadir al presupuesto general
         listaPresupuesto.push({
           nombreVid1: `Manual (${pBase.toFixed(2)} €/m²${margen ? ` +${margen}%` : ''})`,
           nombreVid2: '',
@@ -208,13 +185,12 @@ v/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
 
         mostrarPresupuesto();
 
-        // Limpiar inputs número/checkbox en el formulario manual
         document.querySelectorAll('#manual input').forEach(i => {
           if (i.type === 'number') i.value = '';
           if (i.type === 'checkbox') i.checked = false;
         });
       } catch (err) {
-        console.error('Error en calculo manual:', err);
+        console.error('Error en cálculo manual:', err);
         alert('Error inesperado al calcular. Mira la consola.');
       }
     });
@@ -224,13 +200,9 @@ v/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
         if (i.type === 'number') i.value = '';
         if (i.type === 'checkbox') i.checked = false;
       });
-      // Limpiar salida manual si lo deseas:
-      // outManual.innerHTML = '';
     });
 
-    // Mostrar presupuesto general
     function mostrarPresupuesto() {
-      // Construir HTML de resultados en memoria y luego colocar en el DOM
       const container = document.createElement('div');
       let totalFinal = 0;
       listaPresupuesto.forEach((v, i) => {
@@ -242,24 +214,17 @@ v/* VIDRES SOSA — SCRIPT PRINCIPAL v8+ (revisado y mejorado) */
           Subtotal: ${fmtMoney(v.subtotal)} — IVA: ${fmtMoney(v.iva)}<br>
           <b>Total: ${fmtMoney(v.total)}</b>
         `;
-        container.appendChild(b);
-        container.appendChild(document.createElement('hr'));
+        container.append(b, document.createElement('hr'));
         totalFinal += (Number.isFinite(v.total) ? v.total : 0);
       });
       const resumen = document.createElement('h3');
       resumen.textContent = `Total general del presupuesto: ${fmtMoney(round2(totalFinal))}`;
-      // Reemplazar contenido de outTarifa
       outTarifa.innerHTML = '';
-      outTarifa.appendChild(container);
-      outTarifa.appendChild(resumen);
+      outTarifa.append(container, resumen);
     }
   }
 
-  // Exportar funciones públicas si se necesita (opcional)
-  window.vidresSosaHelpers = {
-    toNum, fmtMoney, fmtNum
-  };
+  // Exportar funciones públicas
+  window.vidresSosaHelpers = { toNum, fmtMoney, fmtNum };
 })();
-    toNum, fmtMoney, fmtNum
-  };
-})();
+
