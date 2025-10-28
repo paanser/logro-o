@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Login Vidres Sosa</title>
+<style>
+  body { font-family: sans-serif; text-align: center; margin-top: 4rem; }
+  .hidden { display: none; }
+  input, button { font-size: 1rem; padding: .5rem 1rem; margin: .5rem; }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <h2>Acceso</h2>
+  <input type="password" id="password" placeholder="Contraseña">
+  <button id="btnLogin">Entrar</button>
+  <p id="error" style="color:red"></p>
+</div>
+
+<div id="app" class="hidden">
+  <h2>APP CARGADA ✅</h2>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('btnLogin');
+  const pass = document.getElementById('password');
+  const err = document.getElementById('error');
+  const login = document.getElementById('login');
+  const app = document.getElementById('app');
+
+  btn.addEventListener('click', check);
+  pass.addEventListener('keypress', e => { if (e.key === 'Enter') check(); });
+
+  function check() {
+    const val = pass.value.trim();
+    const real = atob('MTIz'); // "123"
+    console.log('Introducida:', val, 'Esperada:', real);
+
+    if (!val) {
+      err.textContent = 'Introduce la contraseña.';
+      return;
+    }
+    if (val === real) {
+      err.textContent = '';
+      login.classList.add('hidden');
+      app.classList.remove('hidden');
+    } else {
+      err.textContent = 'Contraseña incorrecta.';
+    }
+  }
+});
+</script>
+
+</body>
+</html>
