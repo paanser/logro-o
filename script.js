@@ -1,15 +1,10 @@
-/* VIDRES SOSA — SCRIPT PRINCIPAL v8.1 (corregido login y compatible con HTML actual) */
+/* VIDRES SOSA — SCRIPT PRINCIPAL v8.2 (login estable Safari/iOS + compatibilidad total) */
 (() => {
-  // ---------- Helpers y formateadores ----------
+  // ---------- Helpers ----------
   const nfCurrency = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
   const nfNumber = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  function toNum(v) {
-    if (v === null || v === undefined) return NaN;
-    const x = String(v).trim().replace(',', '.');
-    const n = parseFloat(x);
-    return Number.isFinite(n) ? n : NaN;
-  }
+  const toNum = v => Number.isFinite(+v) ? parseFloat(String(v).replace(',', '.')) : NaN;
   const fmtMoney = v => Number.isFinite(v) ? nfCurrency.format(v) : '-';
   const fmtNum = v => Number.isFinite(v) ? nfNumber.format(v) : '-';
   const round2 = v => Math.round((v + Number.EPSILON) * 100) / 100;
@@ -18,53 +13,73 @@
   let listaPresupuesto = [];
   let appInitialized = false;
 
-  // ---------- Login ----------
-  document.addEventListener('DOMContentLoaded', () => {
+  // Forzar ejecución aunque defer falle (Safari)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLogin);
+  } else {
+    initLogin();
+  }
+
+  function initLogin() {
+    console.log('✅ Login inicializado');
     const loginDiv = document.getElementById('login');
     const appDiv = document.getElementById('app');
     const btnLogin = document.getElementById('btnLogin');
     const passInput = document.getElementById('password');
     const errorMsg = document.getElementById('error');
 
-    // Intenta restaurar sesión anterior
-    try {
-      if (sessionStorage.getItem('logged') === 'true') {
-        loginDiv.classList.add('hidden');
-        appDiv.classList.remove('hidden');
-        appDiv.setAttribute('aria-hidden', 'false');
-        initAppOnce();
-        return;
-      }
-    } catch { console.warn('sessionStorage no disponible'); }
+    if (!loginDiv || !appDiv || !btnLogin || !passInput) {
+      console.error('❌ Elementos del login no encontrados');
+      return;
+    }
 
-    // --- evento de login ---
+    // Restaurar sesión previa (solo si posible)
+    let logged = false;
+    try {
+      logged = sessionStorage.getItem('logged') === 'true';
+    } catch {
+      console.warn('sessionStorage no disponible');
+    }
+
+    if (logged) {
+      mostrarApp();
+      return;
+    }
+
     btnLogin.addEventListener('click', checkPassword);
     passInput.addEventListener('keypress', e => { if (e.key === 'Enter') checkPassword(); });
 
     function checkPassword() {
       const input = (passInput.value || '').trim();
-      const demoReal = atob('MTIz'); // "123"
+      const real = atob('MTIz'); // "123"
+
+      console.log('👉 comprobando contraseña', input);
 
       if (!input) {
         errorMsg.textContent = 'Introduce la contraseña.';
         return;
       }
 
-      if (input === demoReal) {
+      if (input === real) {
         try { sessionStorage.setItem('logged', 'true'); } catch {}
-        loginDiv.classList.add('hidden');
-        loginDiv.setAttribute('aria-hidden', 'true');
-        appDiv.classList.remove('hidden');
-        appDiv.setAttribute('aria-hidden', 'false');
-        errorMsg.textContent = '';
-        initAppOnce();
+        mostrarApp();
       } else {
         errorMsg.textContent = 'Contraseña incorrecta.';
       }
     }
-  });
 
-  // ---------- Carga tabla de múltiplos ----------
+    function mostrarApp() {
+      loginDiv.classList.add('hidden');
+      loginDiv.setAttribute('aria-hidden', 'true');
+      appDiv.classList.remove('hidden');
+      appDiv.setAttribute('aria-hidden', 'false');
+      errorMsg.textContent = '';
+      console.log('✅ Login correcto, cargando app...');
+      initAppOnce();
+    }
+  }
+
+  // ---------- Cargar tabla de múltiplos ----------
   async function loadMultiplosCSV(url) {
     try {
       const res = await fetch(url);
@@ -76,13 +91,14 @@
         .map(s => parseFloat(s.trim().replace(',', '.')))
         .filter(n => Number.isFinite(n))
         .sort((a, b) => a - b);
+      console.log('📄 Multiplos cargados:', multiplos.length);
     } catch (err) {
-      console.warn('No se pudo cargar multiplos.csv:', err);
+      console.warn('⚠️ No se pudo cargar multiplos.csv:', err);
       multiplos = [];
     }
   }
 
-  // ---------- Inicializar la app una sola vez ----------
+  // ---------- Inicializar app ----------
   function initAppOnce() {
     if (appInitialized) return;
     appInitialized = true;
@@ -90,8 +106,8 @@
     initApp();
   }
 
-  // ---------- Lógica principal ----------
   function initApp() {
+    console.log('✅ App iniciada');
     const btnManual = document.getElementById('btnManual');
     const btnTarifa = document.getElementById('btnTarifa');
     const manualDiv = document.getElementById('manual');
@@ -99,7 +115,8 @@
     const outManual = document.getElementById('resultadoManual');
     const outTarifa = document.getElementById('resultadoTarifa');
 
-    // Cambiar modo (manual/tarifa)
+    if (!btnManual || !btnTarifa) return console.error('Botones de modo no encontrados');
+
     btnManual.addEventListener('click', () => setMode('manual'));
     btnTarifa.addEventListener('click', () => setMode('tarifa'));
 
@@ -113,22 +130,23 @@
       btnTarifa.setAttribute('aria-pressed', !isManual);
     }
 
-    // Helpers cálculo
-    const ajustarPorTabla = (m2) => {
-      if (!multiplos.length) return round2(m2);
-      for (const m of multiplos) if (m2 <= m) return m;
-      return multiplos[multiplos.length - 1];
-    };
-    const aplicarMargen = (precio, margen) => {
-      const m = toNum(margen);
-      return Number.isFinite(m) ? precio * (1 + m / 100) : precio;
-    };
-
-    // Botones manual
+    // --- Botón Calcular Manual ---
     const btnCalcularManual = document.getElementById('btnCalcularManual');
     const btnNuevoManual = document.getElementById('btnNuevoManual');
 
-    btnCalcularManual.addEventListener('click', () => {
+    if (btnCalcularManual) {
+      btnCalcularManual.addEventListener('click', calcularManual);
+    }
+    if (btnNuevoManual) {
+      btnNuevoManual.addEventListener('click', () => {
+        document.querySelectorAll('#manual input').forEach(i => {
+          if (i.type === 'number') i.value = '';
+          if (i.type === 'checkbox') i.checked = false;
+        });
+      });
+    }
+
+    function calcularManual() {
       const ancho = toNum(document.getElementById('anchoManual').value);
       const alto = toNum(document.getElementById('altoManual').value);
       const uds = parseInt(document.getElementById('unidadesManual').value, 10) || 1;
@@ -142,7 +160,7 @@
       const Ared = round2(Math.ceil(ancho / 0.06) * 0.06);
       const Bred = round2(Math.ceil(alto / 0.06) * 0.06);
       const areaBruta = round2(Ared * Bred);
-      const area = ajustarPorTabla(areaBruta);
+      const area = multiplos.length ? ajustarPorTabla(areaBruta) : areaBruta;
 
       const pVidFinal = aplicarMargen(pBase, margen);
       const subtotalVid = round2(area * pVidFinal * uds);
@@ -168,34 +186,27 @@
       bloque.className = 'bloque-vidrio';
       bloque.innerHTML = `
         <b>Cálculo Manual</b><br>
-        Medidas introducidas: ${fmtNum(ancho)} × ${fmtNum(alto)} m<br>
+        Medidas: ${fmtNum(ancho)} × ${fmtNum(alto)} m<br>
         Ajustadas: ${fmtNum(Ared)} × ${fmtNum(Bred)} = ${fmtNum(area)} m²<br>
-        Precio vidrio: ${fmtMoney(pVidFinal)} €/m² — Unidades: ${uds}<br>
+        Vidrio: ${fmtMoney(pVidFinal)} €/m² — Unidades: ${uds}<br>
         Cantos: ${fmtNum(ml)} m × ${fmtMoney(pCanto)} = ${fmtMoney(costeCantos)}<br>
-        Subtotal: ${fmtMoney(subtotal)} — IVA (21%): ${fmtMoney(iva)}<br>
+        Subtotal: ${fmtMoney(subtotal)} — IVA: ${fmtMoney(iva)}<br>
         <b>Total: ${fmtMoney(total)}</b>
       `;
       outManual.append(bloque, document.createElement('hr'));
 
-      listaPresupuesto.push({
-        nombreVid1: `Manual (${pBase.toFixed(2)} €/m²${margen ? ` +${margen}%` : ''})`,
-        area, uds, subtotal, iva, total
-      });
-
+      listaPresupuesto.push({ area, uds, subtotal, iva, total });
       mostrarPresupuesto();
+    }
 
-      document.querySelectorAll('#manual input').forEach(i => {
-        if (i.type === 'number') i.value = '';
-        if (i.type === 'checkbox') i.checked = false;
-      });
-    });
-
-    btnNuevoManual.addEventListener('click', () => {
-      document.querySelectorAll('#manual input').forEach(i => {
-        if (i.type === 'number') i.value = '';
-        if (i.type === 'checkbox') i.checked = false;
-      });
-    });
+    const ajustarPorTabla = (m2) => {
+      for (const m of multiplos) if (m2 <= m) return m;
+      return multiplos.length ? multiplos[multiplos.length - 1] : m2;
+    };
+    const aplicarMargen = (precio, margen) => {
+      const m = toNum(margen);
+      return Number.isFinite(m) ? precio * (1 + m / 100) : precio;
+    };
 
     function mostrarPresupuesto() {
       const container = document.createElement('div');
@@ -204,22 +215,20 @@
         const b = document.createElement('div');
         b.className = 'bloque-vidrio';
         b.innerHTML = `
-          <b>${i + 1}. ${v.nombreVid1}</b><br>
-          Superficie: ${fmtNum(v.area)} m² — Unidades: ${v.uds}<br>
+          <b>${i + 1}.</b> Superficie: ${fmtNum(v.area)} m² — Uds: ${v.uds}<br>
           Subtotal: ${fmtMoney(v.subtotal)} — IVA: ${fmtMoney(v.iva)}<br>
           <b>Total: ${fmtMoney(v.total)}</b>
         `;
         container.append(b, document.createElement('hr'));
         totalFinal += v.total;
       });
+      outTarifa.innerHTML = '';
       const resumen = document.createElement('h3');
       resumen.textContent = `Total general: ${fmtMoney(round2(totalFinal))}`;
-      outTarifa.innerHTML = '';
       outTarifa.append(container, resumen);
     }
   }
 
-  // Exportar helpers si hace falta
+  // Exportar helpers
   window.vidresSosaHelpers = { toNum, fmtMoney, fmtNum };
 })();
-
