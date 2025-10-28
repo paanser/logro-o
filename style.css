@@ -8,7 +8,7 @@ body {
   padding: 0;
 }
 
-.hidden { display: none; }
+.hidden { display: none !important; }
 
 .header {
   background: linear-gradient(90deg, #006c3b, #009e50);
@@ -47,6 +47,27 @@ body {
 
 .export-btn:hover { background: #009e50; }
 
+.mode-selector {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.mode-selector button {
+  background: #009e50;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.mode-selector button.active {
+  background: #00773d;
+}
+
 .resultado {
   margin: 20px auto;
   max-width: 500px;
@@ -67,3 +88,9 @@ body {
   padding: 10px;
 }
 
+.footer {
+  text-align: center;
+  padding: 10px;
+  font-size: 0.9rem;
+  color: #555;
+}
