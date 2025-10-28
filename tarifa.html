@@ -18,10 +18,10 @@
     <a href="index.html" class="volver">← Volver</a>
   </header>
 
-  <!-- FORMULARIO DE MEDIDAS -->
+  <!-- FORMULARIO TODO EN UNO -->
   <section class="form-section">
     <div class="form-container">
-      <h2>1️⃣ Introduce las medidas del vidrio</h2>
+      <h2>Calculadora rápida de vidrios por tarifa</h2>
       <div class="form-grid">
         <label>Ancho (m):</label>
         <input type="number" id="ancho" step="0.001" placeholder="Ej. 1.394">
@@ -31,18 +31,11 @@
 
         <label>Tipo de vidrio:</label>
         <select id="tipoVidrio">
-          <option value="">Selecciona tipo de vidrio...</option>
+          <option value="">Cargando tarifa...</option>
         </select>
       </div>
 
-      <button id="btnCantos" class="calc-btn">Siguiente: Calcular cantos</button>
-    </div>
-  </section>
-
-  <!-- SECCIÓN DE CANTOS -->
-  <section id="cantos-section" class="form-section hidden">
-    <div class="form-container">
-      <h2>2️⃣ Selecciona los lados con canto pulido</h2>
+      <h3>Cantos pulidos</h3>
       <div class="lados-container">
         <button class="lado-btn" data-lado="top">↑</button>
         <button class="lado-btn" data-lado="left">←</button>
@@ -50,7 +43,7 @@
         <button class="lado-btn" data-lado="bottom">↓</button>
       </div>
 
-      <h3>¿Cómo calcular el precio del canto?</h3>
+      <h3>Modo de cálculo del canto</h3>
       <div class="menu-buttons">
         <button id="btnManualCanto" class="mode-btn manual">Manual €/ml</button>
         <button id="btnTarifaCanto" class="mode-btn tarifa">Por Tarifa</button>
@@ -61,16 +54,10 @@
         <input type="number" id="precioCantoManual" step="0.01" placeholder="Ej. 5.00">
       </div>
 
-      <button id="btnFinal" class="calc-btn hidden">Calcular Precio Final</button>
-    </div>
-  </section>
+      <button id="btnCalcular" class="calc-btn">Calcular Precio Final</button>
 
-  <!-- RESULTADO -->
-  <section id="resultado-section" class="form-section hidden">
-    <div class="form-container">
-      <h2>3️⃣ Resultado Final</h2>
-      <div id="resultado" class="resultado"></div>
-      <button id="btnPDF" class="pdf-btn">Descargar PDF</button>
+      <div id="resultado" class="resultado hidden"></div>
+      <button id="btnPDF" class="pdf-btn hidden">Descargar PDF</button>
     </div>
   </section>
 
@@ -79,6 +66,4 @@
   </footer>
 
 </body>
-</html>
-
 </html>
