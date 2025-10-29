@@ -1,26 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Acceso · Vidres Sosa</title>
-  <meta name="description" content="Acceso seguro a la calculadora de Vidres Sosa" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body class="login-body">
-  <main id="login" class="login-card" role="main" aria-labelledby="login-title">
-    <img src="logo.png" alt="Vidres Sosa" class="login-logo" />
-    <h1 id="login-title" class="login-title">Acceso</h1>
-    <p class="login-subtitle">Introduce la contraseña para continuar</p>
-
-    <label for="password" class="sr-only">Contraseña</label>
-    <input type="password" id="password" placeholder="Contraseña" autocomplete="current-password" />
-    <button id="btnLogin" class="btn-primary">Entrar</button>
-    <p id="error" class="error-text" role="alert" aria-live="polite"></p>
-
-    <p class="hint">Pulsa <kbd>Enter</kbd> para acceder</p>
-  </main>
-
+  <link rel="stylesheet" href="style.css">
   <script src="login.js" defer></script>
+</head>
+<body>
+
+  <div id="login-screen">
+    <img src="logo.png" alt="Vidres Sosa" class="logo">
+    <h2>Acceso restringido</h2>
+    <input type="password" id="password" placeholder="Contraseña">
+    <button id="btnLogin">Entrar</button>
+    <p id="error" class="error"></p>
+  </div>
+
+  <div id="mode-screen" class="hidden">
+    <img src="logo.png" alt="Vidres Sosa" class="logo">
+    <h2>Selecciona el modo de cálculo</h2>
+    <div class="mode-buttons">
+      <button onclick="location.href='manual.html'">Cálculo Manual</button>
+      <button onclick="location.href='tarifa.html'">Cálculo por Tarifa</button>
+    </div>
+  </div>
+
 </body>
 </html>
