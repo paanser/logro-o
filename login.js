@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const passwordInput = document.getElementById('password');
   const errorEl = document.getElementById('error');
 
-  // 🔐 Contraseña correcta (puedes cambiarla aquí)
-  const CONTRASEÑA_CORRECTA = 'vidressosa';
+  // 🔐 Contraseña correcta (configurada por Pau)
+  const CONTRASEÑA_CORRECTA = '123';
 
   function iniciarSesion() {
     const password = passwordInput.value.trim();
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (e) {
         console.warn('El almacenamiento de sesión no está disponible');
       }
-      // Redirige a la calculadora (puedes cambiar el nombre si tu archivo se llama distinto)
+      // Redirige a la calculadora (ajusta el nombre del archivo si es distinto)
       window.location.href = 'calculadora.html';
     } else {
       errorEl.textContent = 'Contraseña incorrecta. Inténtalo de nuevo.';
