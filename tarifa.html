@@ -3,83 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vidres Sosa · Tarifa Directa PRO</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <title>Modo Tarifa · Vidres Sosa</title>
+
+  <!-- Estilos y librerías -->
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="script_tarifa.js" defer></script>
 </head>
-<body>
 
+<body>
   <!-- CABECERA -->
-  <header class="main-header">
-    <div class="header-content">
-      <img src="logo.png" alt="Vidres Sosa" class="logo-header">
-      <h1>Vidres Sosa · Calculadora por Tarifa</h1>
-      <a href="index.html" class="volver">← Volver</a>
-    </div>
+  <header class="topbar">
+    <h1>Modo Tarifa · Vidres Sosa</h1>
+    <button id="backToMenu2" class="btn-secundario">← Volver</button>
   </header>
 
-  <!-- FORMULARIO TODO EN UNO -->
-  <main class="tarifa-main">
-    <div class="tarifa-card">
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="container">
 
-      <h2>🧮 Cálculo directo con tarifas oficiales</h2>
+    <!-- ==============================
+         1. DATOS DE MEDIDA
+         ============================== -->
+    <section class="card">
+      <h2>1️⃣ Datos de medida</h2>
 
-      <div class="input-group">
-        <label>Ancho (m)</label>
-        <input type="number" id="ancho" step="0.001" placeholder="Ej. 1.394">
+      <label for="tarifa-ancho">Ancho (mm)</label>
+      <input type="number" id="tarifa-ancho" placeholder="Ej. 1000">
+
+      <label for="tarifa-alto">Alto (mm)</label>
+      <input type="number" id="tarifa-alto" placeholder="Ej. 550">
+
+      <div class="ajuste">
+        <input type="checkbox" id="ajusteMultiplo6Tarifa" checked>
+        <label for="ajusteMultiplo6Tarifa">Ajustar medidas a múltiplos de 6 mm (superior)</label>
+      </div>
+    </section>
+
+    <!-- ==============================
+         2. TIPO DE VIDRIO
+         ============================== -->
+    <section class="card">
+      <h2>2️⃣ Tipo de vidrio</h2>
+      <label for="tarifa-tipo">Selecciona tipo según tarifa</label>
+      <select id="tarifa-tipo"></select>
+
+      <label class="checkbox">
+        <input type="checkbox" id="usarCantosTarifa">
+        <span>Incluir cantos pulidos según tarifa</span>
+      </label>
+    </section>
+
+    <!-- ==============================
+         3. CALCULAR Y RESULTADOS
+         ============================== -->
+    <section class="card">
+      <h2>3️⃣ Calcular</h2>
+
+      <div class="botones">
+        <button id="btnCalcularTarifa" class="btn verde">Calcular</button>
+        <button id="btnPDFTarifa" class="btn rojo">Exportar PDF</button>
       </div>
 
-      <div class="input-group">
-        <label>Alto (m)</label>
-        <input type="number" id="alto" step="0.001" placeholder="Ej. 0.957">
+      <div id="tarifa-resultado" class="resultado">
+        <p><strong>Vidrio:</strong> —</p>
+        <p><strong>Área ajustada (m²):</strong> —</p>
+        <p><strong>Precio vidrio:</strong> —</p>
+        <p><strong>Precio cantos:</strong> —</p>
+        <p><strong>Subtotal:</strong> —</p>
+        <p><strong>IVA (21 %):</strong> —</p>
+        <p><strong>Total:</strong> —</p>
       </div>
-
-      <div class="input-group">
-        <label>Tipo de vidrio (tarifa)</label>
-        <select id="tipoVidrio">
-          <option value="">Cargando tarifa...</option>
-        </select>
-      </div>
-
-      <div class="input-group">
-        <label>Lados con canto pulido</label>
-        <div class="lados-container">
-          <button class="lado-btn" data-lado="top">↑</button>
-          <button class="lado-btn" data-lado="left">←</button>
-          <button class="lado-btn" data-lado="right">→</button>
-          <button class="lado-btn" data-lado="bottom">↓</button>
-        </div>
-      </div>
-
-      <div class="input-group">
-        <label>Método de cálculo del canto</label>
-        <div class="checkbox-group">
-          <input type="radio" name="modoCanto" id="cantoManual" checked>
-          <label for="cantoManual">Manual €/ml</label>
-          <input type="radio" name="modoCanto" id="cantoTarifa">
-          <label for="cantoTarifa">Por tarifa</label>
-        </div>
-      </div>
-
-      <div class="input-group" id="manualCantoBox">
-        <label>Precio manual €/ml</label>
-        <input type="number" id="precioCantoManual" step="0.01" placeholder="Ej. 5.00">
-      </div>
-
-      <div class="btn-container">
-        <button id="btnCalcular" class="calc-btn">Calcular precio</button>
-      </div>
-
-      <div id="resultado" class="resultado hidden"></div>
-      <button id="btnPDF" class="pdf-btn hidden">📄 Descargar PDF</button>
-    </div>
+    </section>
   </main>
 
   <footer>
-    <p>© 2025 Vidres Sosa · Calculadora PRO</p>
+    <p>© 2025 Vidres Sosa · Cálculo por Tarifa</p>
   </footer>
-
 </body>
 </html>
