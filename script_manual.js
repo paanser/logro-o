@@ -1,157 +1,120 @@
-// ===== VIDRES SOSA · SCRIPT MANUAL v2.0 =====
+const state = {
+  cantos: new Set()
+};
+
+// === INICIALIZAR ===
 document.addEventListener("DOMContentLoaded", () => {
+  initCantos();
+  document.getElementById("btnCalcular").addEventListener("click", calcular);
+  document.getElementById("btnReiniciar").addEventListener("click", reiniciar);
+  document.getElementById("btnPDF").addEventListener("click", generarPDF);
+});
 
-  const anchoInput = document.getElementById("ancho");
-  const altoInput = document.getElementById("alto");
-  const tipoInput = document.getElementById("tipoVidrio");
-  const precioM2Input = document.getElementById("precioM2");
+// === CANTOS ===
+function initCantos() {
+  const group = document.getElementById("cantosGroup");
+  group.addEventListener("click", (e) => {
+    const btn = e.target.closest(".edge-btn");
+    if (!btn) return;
+    const edge = btn.dataset.edge;
 
-  const btnCantos = document.getElementById("btnCantos");
-  const cantosSection = document.getElementById("cantos-section");
-  const btnManualCanto = document.getElementById("btnManualCanto");
-  const btnTarifaCanto = document.getElementById("btnTarifaCanto");
-  const manualCantoInput = document.getElementById("manual-canto-input");
-  const btnFinal = document.getElementById("btnFinal");
-  const resultadoSection = document.getElementById("resultado-section");
-  const resultadoDiv = document.getElementById("resultado");
-  const btnPDF = document.getElementById("btnPDF");
-
-  const ladoBtns = document.querySelectorAll(".lado-btn");
-  let ladosSeleccionados = [];
-  let precioCantoManual = 0;
-  let usarTarifaCantos = false;
-  let multiplos = [];
-
-  // ===== CARGA DE MÚLTIPLOS =====
-  fetch("multiplos.csv")
-    .then(r => r.text())
-    .then(data => {
-      const lineas = data.trim().split("\n").slice(1);
-      multiplos = lineas.map(l => {
-        const [minimo, maximo] = l.split(",").map(Number);
-        return { minimo, maximo };
-      });
-    });
-
-  // ===== PASO 1: Medidas introducidas =====
-  btnCantos.addEventListener("click", () => {
-    const ancho = parseFloat(anchoInput.value);
-    const alto = parseFloat(altoInput.value);
-    const tipo = tipoInput.value;
-    const precioM2 = parseFloat(precioM2Input.value);
-
-    if (!ancho || !alto || !tipo || !precioM2) {
-      alert("Completa todas las medidas y precio €/m² antes de continuar.");
-      return;
-    }
-
-    cantosSection.classList.remove("hidden");
-    window.scrollTo({ top: cantosSection.offsetTop, behavior: "smooth" });
-  });
-
-  // ===== SELECCIÓN DE LADOS =====
-  ladoBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const lado = btn.dataset.lado;
-      if (ladosSeleccionados.includes(lado)) {
-        ladosSeleccionados = ladosSeleccionados.filter(l => l !== lado);
+    // lógica toggle
+    if (edge === "perimetral") {
+      // desactiva todo y activa solo perimetral
+      state.cantos.clear();
+      document.querySelectorAll(".edge-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.cantos.add("perimetral");
+    } else {
+      // si está activo, desactiva
+      if (btn.classList.contains("active")) {
         btn.classList.remove("active");
+        state.cantos.delete(edge);
       } else {
-        ladosSeleccionados.push(lado);
+        // si perimetral estaba activo, quítalo
+        const peri = document.querySelector('[data-edge="perimetral"]');
+        peri.classList.remove("active");
+        state.cantos.delete("perimetral");
         btn.classList.add("active");
+        state.cantos.add(edge);
       }
-    });
-  });
-
-  // ===== SELECCIÓN DE MODO DE CANTO =====
-  btnManualCanto.addEventListener("click", () => {
-    manualCantoInput.classList.remove("hidden");
-    usarTarifaCantos = false;
-    btnFinal.classList.remove("hidden");
-  });
-
-  btnTarifaCanto.addEventListener("click", () => {
-    manualCantoInput.classList.add("hidden");
-    usarTarifaCantos = true;
-    btnFinal.classList.remove("hidden");
-  });
-
-  // ===== FUNCIÓN DE AJUSTE DE MÚLTIPLOS =====
-  function ajustarMultiplo(valor) {
-    if (multiplos.length === 0) return Math.ceil(valor / 0.06) * 0.06;
-    for (let i = 0; i < multiplos.length; i++) {
-      const { minimo, maximo } = multiplos[i];
-      if (valor > minimo && valor <= maximo) return maximo;
     }
-    return valor;
+  });
+}
+
+// === CALCULO ===
+function calcular() {
+  const ancho = parseFloat(document.getElementById("ancho").value) || 0;
+  const alto = parseFloat(document.getElementById("alto").value) || 0;
+  const espesor = parseFloat(document.getElementById("espesor").value) || 0;
+  const tipoVidrio = document.getElementById("tipoVidrio").value || "Sin especificar";
+  const ajuste = document.getElementById("ajusteMultiplo6").checked;
+  const precioCanto = parseFloat(document.getElementById("precioCantoML").value) || 0;
+
+  if (!ancho || !alto || !espesor) {
+    alert("Introduce ancho, alto y espesor.");
+    return;
   }
 
-  // ===== PASO FINAL: CÁLCULO =====
-  btnFinal.addEventListener("click", async () => {
-    const anchoReal = parseFloat(anchoInput.value);
-    const altoReal = parseFloat(altoInput.value);
-    const tipo = tipoInput.value;
-    const precioM2 = parseFloat(precioM2Input.value);
-    precioCantoManual = parseFloat(document.getElementById("precioCantoManual").value) || 0;
+  const anchoFact = ajuste ? Math.ceil(ancho / 6) * 6 : ancho;
+  const altoFact = ajuste ? Math.ceil(alto / 6) * 6 : alto;
+  const m2 = (anchoFact / 1000) * (altoFact / 1000);
 
-    const anchoCorr = ajustarMultiplo(anchoReal);
-    const altoCorr = ajustarMultiplo(altoReal);
+  // Calcular metros lineales de cantos
+  let ml = 0;
+  if (state.cantos.has("perimetral")) {
+    ml = 2 * (anchoFact / 1000 + altoFact / 1000);
+  } else {
+    if (state.cantos.has("superior")) ml += anchoFact / 1000;
+    if (state.cantos.has("inferior")) ml += anchoFact / 1000;
+    if (state.cantos.has("izquierdo")) ml += altoFact / 1000;
+    if (state.cantos.has("derecho")) ml += altoFact / 1000;
+  }
 
-    const areaReal = anchoReal * altoReal;
-    const areaCorr = anchoCorr * altoCorr;
+  const base = m2 * 0 + ml * precioCanto; // sin tarifa base, solo cantos
+  const iva = base * 0.21;
+  const total = base + iva;
 
-    // CANTOS
-    let ml = 0;
-    ladosSeleccionados.forEach(lado => {
-      if (lado === "top" || lado === "bottom") ml += anchoCorr;
-      else ml += altoCorr;
-    });
+  document.getElementById("medidaFact").textContent = `${anchoFact} x ${altoFact} mm`;
+  document.getElementById("m2Ajustados").textContent = m2.toFixed(3);
+  document.getElementById("mlCanto").textContent = ml.toFixed(2);
+  document.getElementById("base").textContent = base.toFixed(2) + " €";
+  document.getElementById("iva").textContent = iva.toFixed(2) + " €";
+  document.getElementById("total").textContent = total.toFixed(2) + " €";
 
-    let precioCanto = 0;
-    if (usarTarifaCantos) {
-      const datos = await fetch("tarifa_cantos.csv").then(r => r.text());
-      const lineas = datos.trim().split("\n").slice(1);
-      const tarifa = lineas[0].split(",")[1];
-      precioCanto = parseFloat(tarifa.replace(",", "."));
-    } else {
-      precioCanto = precioCantoManual;
-    }
+  state.resultado = { anchoFact, altoFact, m2, ml, base, iva, total, tipoVidrio, espesor };
+}
 
-    const precioVidrio = areaCorr * precioM2;
-    const precioCantos = ml * precioCanto;
-    const subtotal = precioVidrio + precioCantos;
-    const iva = subtotal * 0.21;
-    const total = subtotal + iva;
+// === REINICIAR ===
+function reiniciar() {
+  document.querySelectorAll("input").forEach(el => el.value = "");
+  document.getElementById("tipoVidrio").value = "";
+  document.getElementById("ajusteMultiplo6").checked = true;
+  document.querySelectorAll(".edge-btn").forEach(b => b.classList.remove("active"));
+  state.cantos.clear();
+  document.querySelectorAll("#resultado span").forEach(s => s.textContent = "");
+}
 
-    resultadoDiv.innerHTML = `
-      <p><b>Tipo de vidrio:</b> ${tipo}</p>
-      <p><b>Medidas reales:</b> ${anchoReal.toFixed(3)} × ${altoReal.toFixed(3)} m</p>
-      <p><b>Medidas corregidas:</b> ${anchoCorr.toFixed(2)} × ${altoCorr.toFixed(2)} m</p>
-      <p><b>Área real:</b> ${areaReal.toFixed(3)} m²</p>
-      <p><b>Área corregida:</b> ${areaCorr.toFixed(3)} m²</p>
-      <p><b>Cantos seleccionados:</b> ${ladosSeleccionados.length} (${ml.toFixed(2)} ml)</p>
-      <p><b>Precio vidrio:</b> ${precioVidrio.toFixed(2)} €</p>
-      <p><b>Precio cantos:</b> ${precioCantos.toFixed(2)} €</p>
-      <p><b>Subtotal:</b> ${subtotal.toFixed(2)} €</p>
-      <p><b>IVA (21%):</b> ${iva.toFixed(2)} €</p>
-      <p><b>Total:</b> ${total.toFixed(2)} €</p>
-    `;
+// === PDF ===
+function generarPDF() {
+  if (!state.resultado) {
+    alert("Calcula primero un vidrio.");
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-    resultadoSection.classList.remove("hidden");
-    window.scrollTo({ top: resultadoSection.offsetTop, behavior: "smooth" });
-  });
+  doc.setFontSize(14);
+  doc.text("Vidres Sosa - Cálculo Manual", 14, 20);
+  doc.setFontSize(11);
+  doc.text(`Tipo de vidrio: ${state.resultado.tipoVidrio}`, 14, 30);
+  doc.text(`Espesor: ${state.resultado.espesor} mm`, 14, 38);
+  doc.text(`Medida facturación: ${state.resultado.anchoFact} x ${state.resultado.altoFact} mm`, 14, 46);
+  doc.text(`Superficie ajustada: ${state.resultado.m2.toFixed(3)} m²`, 14, 54);
+  doc.text(`Metros lineales pulidos: ${state.resultado.ml.toFixed(2)} ml`, 14, 62);
+  doc.text(`Base sin IVA: ${state.resultado.base.toFixed(2)} €`, 14, 70);
+  doc.text(`IVA 21%: ${state.resultado.iva.toFixed(2)} €`, 14, 78);
+  doc.text(`Total: ${state.resultado.total.toFixed(2)} €`, 14, 86);
 
-  // ===== PDF =====
-  btnPDF.addEventListener("click", () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.addImage("logo.png", "PNG", 10, 10, 30, 20);
-    doc.setFontSize(14);
-    doc.text("Vidres Sosa - Cálculo Manual", 50, 20);
-    doc.setFontSize(11);
-    const lineas = resultadoDiv.innerText.split("\n");
-    doc.text(lineas, 10, 40);
-    doc.save("resultado_manual.pdf");
-  });
-
-});
+  doc.save("Calculo_Manual_Vidres_Sosa.pdf");
+}
