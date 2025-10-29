@@ -1,4 +1,4 @@
-// ======== SCRIPT VIDRES SOSA CALCULADORA PRO v1.1 ======== //
+// ======== SCRIPT VIDRES SOSA CALCULADORA PRO v1.2 ======== //
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -57,25 +57,41 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnCalcularManual = document.getElementById("btnCalcularManual");
   const manualResultado = document.getElementById("manual-resultado");
   const btnPDFManual = document.getElementById("btnPDFManual");
-  const ladoBtns = document.querySelectorAll(".lado-btn");
 
+  // === SELECCIÓN DE CANTOS PULIDOS === //
+  const ladoBtns = document.querySelectorAll(".canto-btn");
   let ladosActivos = [];
 
-  // Selección de lados de canto
   ladoBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       const lado = btn.dataset.lado;
+
+      // Si el botón es perimetral, alterna todos
+      if (lado === "perimetral") {
+        const todosActivos = ladosActivos.length === 4;
+        ladosActivos = todosActivos ? [] : ["top", "bottom", "left", "right"];
+
+        ladoBtns.forEach(b => {
+          if (b.dataset.lado !== "perimetral") {
+            b.classList.toggle("activo", !todosActivos);
+          }
+        });
+        btn.classList.toggle("activo", !todosActivos);
+        return;
+      }
+
+      // Alternar selección individual
       if (ladosActivos.includes(lado)) {
         ladosActivos = ladosActivos.filter(l => l !== lado);
-        btn.classList.remove("active");
+        btn.classList.remove("activo");
       } else {
         ladosActivos.push(lado);
-        btn.classList.add("active");
+        btn.classList.add("activo");
       }
     });
   });
 
-  // Calcular precio manual
+  // === CÁLCULO MANUAL === //
   btnCalcularManual.addEventListener("click", () => {
     const ancho = parseFloat(document.getElementById("manual-ancho").value);
     const alto = parseFloat(document.getElementById("manual-alto").value);
@@ -100,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
     manualResultado.innerHTML = `
       <p><b>Tipo de vidrio:</b> ${tipo}</p>
       <p><b>Área:</b> ${areaM2.toFixed(2)} m²</p>
-      <p><b>Cantos seleccionados:</b> ${ladosActivos.length}</p>
+      <p><b>Cantos seleccionados:</b> ${ladosActivos.join(", ") || "Ninguno"}</p>
       <p><b>Metros lineales:</b> ${perimetroML.toFixed(2)} ml</p>
       <p><b>Precio vidrio:</b> ${precioVidrio.toFixed(2)} €</p>
       <p><b>Precio cantos:</b> ${precioCantos.toFixed(2)} €</p>
