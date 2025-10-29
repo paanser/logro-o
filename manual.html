@@ -3,81 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vidres Sosa - Cálculo Manual</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <title>Calculadora Manual - Vidres Sosa</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="login.js" defer></script>
   <script src="script_manual.js" defer></script>
 </head>
+
 <body>
+  <!-- LOGIN -->
+  <div id="login" class="login-container">
+    <h2>Acceso</h2>
+    <input type="password" id="password" placeholder="Contraseña">
+    <button id="btnLogin">Entrar</button>
+    <p id="error" style="color:red"></p>
+  </div>
 
-  <!-- CABECERA -->
-  <header class="main-header">
-    <img src="logo.png" alt="Vidres Sosa" class="logo-header">
-    <h1>Vidres Sosa · Cálculo Manual</h1>
-    <a href="index.html" class="volver">← Volver</a>
-  </header>
+  <!-- APP -->
+  <div id="app" style="display:none;">
+    <header class="topbar">
+      <h1>Calculadora Manual · Vidres Sosa</h1>
+    </header>
 
-  <!-- FORMULARIO DE MEDIDAS -->
-  <section class="form-section">
-    <div class="form-container">
-      <h2>1️⃣ Introduce las medidas del vidrio</h2>
-      <div class="form-grid">
-        <label>Ancho (m):</label>
-        <input type="number" id="ancho" step="0.001" placeholder="Ej. 1.394">
+    <main class="container">
+      <!-- DATOS -->
+      <section class="card">
+        <h2>1. Datos del vidrio</h2>
+        <div class="grid">
+          <label class="field">
+            <span>Ancho (mm)</span>
+            <input type="number" id="ancho" placeholder="Ej. 1000">
+          </label>
+          <label class="field">
+            <span>Alto (mm)</span>
+            <input type="number" id="alto" placeholder="Ej. 550">
+          </label>
+          <label class="field">
+            <span>Espesor (mm)</span>
+            <input type="number" id="espesor" placeholder="Ej. 5">
+          </label>
+          <label class="field">
+            <span>Tipo de vidrio (opcional)</span>
+            <select id="tipoVidrio">
+              <option value="">— Sin especificar —</option>
+              <option value="float">Float incoloro</option>
+              <option value="laminado">Laminado</option>
+              <option value="templado">Templado</option>
+            </select>
+          </label>
+        </div>
+        <label class="checkbox">
+          <input type="checkbox" id="ajusteMultiplo6" checked>
+          <span>Ajustar medidas a múltiplos de 6 mm</span>
+        </label>
+      </section>
 
-        <label>Alto (m):</label>
-        <input type="number" id="alto" step="0.001" placeholder="Ej. 0.957">
+      <!-- CANTOS -->
+      <section class="card">
+        <h2>2. Cantos pulidos</h2>
+        <div id="cantosGroup" class="cantos">
+          <button class="edge-btn" data-edge="superior">Superior</button>
+          <button class="edge-btn" data-edge="inferior">Inferior</button>
+          <button class="edge-btn" data-edge="izquierdo">Izquierdo</button>
+          <button class="edge-btn" data-edge="derecho">Derecho</button>
+          <button class="edge-btn" data-edge="perimetral">Perimetral</button>
+        </div>
+        <div class="grid">
+          <label class="field">
+            <span>Precio ML canto (€)</span>
+            <input type="number" id="precioCantoML" step="0.01" placeholder="Ej. 4.50">
+          </label>
+        </div>
+      </section>
 
-        <label>Tipo de vidrio:</label>
-        <input type="text" id="tipoVidrio" placeholder="Ej. 5+5 Incoloro">
+      <!-- CALCULO -->
+      <section class="card">
+        <h2>3. Calcular</h2>
+        <div class="inline">
+          <button id="btnCalcular" class="btn primary">Calcular</button>
+          <button id="btnReiniciar" class="btn">Reiniciar</button>
+          <button id="btnPDF" class="btn">Exportar PDF</button>
+        </div>
 
-        <label>Precio €/m² (manual):</label>
-        <input type="number" id="precioM2" step="0.01" placeholder="Ej. 45.00">
-      </div>
-
-      <button id="btnCantos" class="calc-btn">Siguiente: Calcular cantos</button>
-    </div>
-  </section>
-
-  <!-- SECCIÓN DE CANTOS -->
-  <section id="cantos-section" class="form-section hidden">
-    <div class="form-container">
-      <h2>2️⃣ Selecciona los lados con canto pulido</h2>
-      <div class="lados-container">
-        <button class="lado-btn" data-lado="top">↑</button>
-        <button class="lado-btn" data-lado="left">←</button>
-        <button class="lado-btn" data-lado="right">→</button>
-        <button class="lado-btn" data-lado="bottom">↓</button>
-      </div>
-
-      <h3>¿Cómo calcular el precio del canto?</h3>
-      <div class="menu-buttons">
-        <button id="btnManualCanto" class="mode-btn manual">Manual €/ml</button>
-        <button id="btnTarifaCanto" class="mode-btn tarifa">Por Tarifa</button>
-      </div>
-
-      <div id="manual-canto-input" class="hidden">
-        <label>Introduce precio €/ml:</label>
-        <input type="number" id="precioCantoManual" step="0.01" placeholder="Ej. 5.00">
-      </div>
-
-      <button id="btnFinal" class="calc-btn hidden">Calcular Precio Final</button>
-    </div>
-  </section>
-
-  <!-- RESULTADO -->
-  <section id="resultado-section" class="form-section hidden">
-    <div class="form-container">
-      <h2>3️⃣ Resultado Final</h2>
-      <div id="resultado" class="resultado"></div>
-      <button id="btnPDF" class="pdf-btn">Descargar PDF</button>
-    </div>
-  </section>
-
-  <footer>
-    <p>© 2025 Vidres Sosa · Calculadora PRO</p>
-  </footer>
-
+        <div id="resultado" class="result">
+          <p><strong>Medida facturación:</strong> <span id="medidaFact"></span></p>
+          <p><strong>Superficie ajustada (m²):</strong> <span id="m2Ajustados"></span></p>
+          <p><strong>Metros lineales pulidos:</strong> <span id="mlCanto"></span></p>
+          <p><strong>Base sin IVA:</strong> <span id="base"></span></p>
+          <p><strong>IVA 21%:</strong> <span id="iva"></span></p>
+          <p><strong>Total:</strong> <span id="total"></span></p>
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
