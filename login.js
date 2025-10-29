@@ -1,45 +1,64 @@
-// =========================================
-//  LOGIN VIDRES SOSA · revisión completa
-// =========================================
+// =========================================================
+// VIDRES SOSA · SISTEMA DE ACCESO Y NAVEGACIÓN ENTRE MODOS
+// =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
+  // === SECCIONES PRINCIPALES ===
+  const loginSection = document.getElementById("login-section");
+  const menuSection = document.getElementById("menu-section");
+  const manualSection = document.getElementById("manual-section");
+  const tarifaSection = document.getElementById("tarifa-section");
+
+  // === ELEMENTOS DE LOGIN ===
+  const btnLogin = document.getElementById("btnLogin");
   const passwordInput = document.getElementById("password");
-  const loginBtn = document.getElementById("btnLogin");
-  const errorMsg = document.getElementById("error");
-  const loginDiv = document.getElementById("login");
-  const appDiv = document.getElementById("app"); // contenedor principal (manual/tarifa)
+  const loginError = document.getElementById("login-error");
 
-  // contraseña correcta
-  const PASSWORD_CORRECTA = "123";
+  // === EVENTO DE LOGIN ===
+  btnLogin.addEventListener("click", () => {
+    const clave = passwordInput.value.trim();
 
-  // al cargar, ocultamos todo el contenido detrás del login
-  if (appDiv) appDiv.style.display = "none";
-
-  // función de validación
-  function validarPassword() {
-    const valor = passwordInput.value.trim();
-    if (valor === PASSWORD_CORRECTA) {
-      // ocultamos login y mostramos el contenido principal
-      loginDiv.style.opacity = "0";
-      loginDiv.style.pointerEvents = "none";
-
-      setTimeout(() => {
-        loginDiv.style.display = "none";
-        if (appDiv) appDiv.style.display = "block";
-        window.scrollTo({ top: 0, behavior: "instant" });
-      }, 200);
+    if (clave === "123") {
+      loginSection.classList.add("hidden");
+      menuSection.classList.remove("hidden");
     } else {
-      errorMsg.textContent = "Contraseña incorrecta.";
+      loginError.textContent = "❌ Contraseña incorrecta.";
       passwordInput.value = "";
       passwordInput.focus();
     }
-  }
+  });
 
-  // evento al hacer click
-  loginBtn.addEventListener("click", validarPassword);
+  // === BOTONES DE MENÚ ===
+  const btnManual = document.getElementById("btnManual");
+  const btnTarifa = document.getElementById("btnTarifa");
+  const backToMenu1 = document.getElementById("backToMenu1");
+  const backToMenu2 = document.getElementById("backToMenu2");
 
-  // evento al presionar Enter
-  passwordInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") validarPassword();
+  // Ir a modo manual
+  btnManual.addEventListener("click", () => {
+    menuSection.classList.add("hidden");
+    manualSection.classList.remove("hidden");
+    manualSection.scrollIntoView({ behavior: "smooth" });
+  });
+
+  // Ir a modo tarifa
+  btnTarifa.addEventListener("click", () => {
+    menuSection.classList.add("hidden");
+    tarifaSection.classList.remove("hidden");
+    tarifaSection.scrollIntoView({ behavior: "smooth" });
+  });
+
+  // Volver al menú desde modo manual
+  backToMenu1.addEventListener("click", () => {
+    manualSection.classList.add("hidden");
+    menuSection.classList.remove("hidden");
+    window.scrollTo({ top: 0 });
+  });
+
+  // Volver al menú desde modo tarifa
+  backToMenu2.addEventListener("click", () => {
+    tarifaSection.classList.add("hidden");
+    menuSection.classList.remove("hidden");
+    window.scrollTo({ top: 0 });
   });
 });
