@@ -1,17 +1,16 @@
 // =========================================================
-// VIDRES SOSA · CÁLCULO MANUAL (v2.3 FINAL)
+// VIDRES SOSA · CÁLCULO MANUAL (v2.4 final)
+// Medidas introducidas en metros → ajustadas internamente a mm múltiplos de 6
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
-  // === BOTONES ===
   const btnCalcular = document.getElementById("btnCalcular");
   const btnReiniciar = document.getElementById("btnReiniciar");
   const btnPDF = document.getElementById("btnPDF");
-
-  // === CANTOS PULIDOS ===
   const edgeButtons = document.querySelectorAll(".edge-btn");
   let edgesSelected = [];
 
+  // === BOTONES DE CANTOS ===
   edgeButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       const edge = btn.dataset.edge;
@@ -43,43 +42,53 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // === FUNCIÓN REDONDEO A MÚLTIPLOS DE 6 SUPERIOR ===
-  function ajustarMultiploSuperior(valor) {
-    if (!valor) return 0;
-    const resto = valor % 6;
-    return resto === 0 ? valor : valor + (6 - resto);
+  // === FUNCIÓN: REDONDEO A MÚLTIPLOS DE 6 mm SUPERIOR ===
+  function ajustarMultiploSuperior(mm) {
+    if (!mm) return 0;
+    const resto = mm % 6;
+    return resto === 0 ? mm : mm + (6 - resto);
   }
 
   // === CÁLCULO PRINCIPAL ===
   btnCalcular.addEventListener("click", () => {
-    const ancho = parseFloat(document.getElementById("ancho").value);
-    const alto = parseFloat(document.getElementById("alto").value);
+    const ancho_m = parseFloat(document.getElementById("ancho").value);
+    const alto_m = parseFloat(document.getElementById("alto").value);
     const espesor = parseFloat(document.getElementById("espesor").value) || 0;
     const tipoVidrio = document.getElementById("tipoVidrio").value.trim();
     const ajustar = document.getElementById("ajusteMultiplo6").checked;
     const precioCanto = parseFloat(document.getElementById("precioCantoML").value) || 0;
 
-    if (!ancho || !alto) {
-      alert("Introduce ancho y alto del vidrio.");
+    if (!ancho_m || !alto_m) {
+      alert("Introduce ancho y alto en metros (por ejemplo 1.345).");
       return;
     }
 
-    // Ajuste a múltiplos de 6 mm hacia arriba
-    const anchoAjustado = ajustar ? ajustarMultiploSuperior(ancho) : ancho;
-    const altoAjustado = ajustar ? ajustarMultiploSuperior(alto) : alto;
+    // Convertir a mm
+    let ancho_mm = ancho_m * 1000;
+    let alto_mm = alto_m * 1000;
 
-    // Área m² redondeada a dos decimales
-    const m2 = Math.ceil(((anchoAjustado * altoAjustado) / 1_000_000) * 100) / 100;
+    // Ajustar múltiplos de 6 mm superiores
+    if (ajustar) {
+      ancho_mm = ajustarMultiploSuperior(ancho_mm);
+      alto_mm = ajustarMultiploSuperior(alto_mm);
+    }
 
-    // Calcular perímetro según cantos
+    // Convertir de nuevo a metros
+    const ancho_ajustado_m = ancho_mm / 1000;
+    const alto_ajustado_m = alto_mm / 1000;
+
+    // Calcular área en m²
+    const m2 = Math.ceil((ancho_ajustado_m * alto_ajustado_m) * 100) / 100;
+
+    // Calcular perímetro según cantos seleccionados
     let perimetro = 0;
-    if (edgesSelected.includes("superior")) perimetro += anchoAjustado;
-    if (edgesSelected.includes("inferior")) perimetro += anchoAjustado;
-    if (edgesSelected.includes("izquierdo")) perimetro += altoAjustado;
-    if (edgesSelected.includes("derecho")) perimetro += altoAjustado;
+    if (edgesSelected.includes("superior")) perimetro += ancho_mm;
+    if (edgesSelected.includes("inferior")) perimetro += ancho_mm;
+    if (edgesSelected.includes("izquierdo")) perimetro += alto_mm;
+    if (edgesSelected.includes("derecho")) perimetro += alto_mm;
     const mlCanto = perimetro / 1000;
 
-    // Precio €/m² base (puedes cambiarlo o hacerlo dinámico)
+    // Precio base €/m² (puedes vincularlo a tarifa)
     const precioM2 = 37.41;
     const base = m2 * precioM2 + mlCanto * precioCanto;
     const iva = base * 0.21;
@@ -88,11 +97,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Mostrar resultados
     const resultadoDiv = document.getElementById("resultado");
     resultadoDiv.innerHTML = `
-      <p><strong>Medida facturación:</strong> ${anchoAjustado} x ${altoAjustado} mm</p>
-      <p><strong>Superficie ajustada (m²):</strong> ${m2.toFixed(2)}</p>
+      <p><strong>Medida facturación (ajustada):</strong> ${ancho_ajustado_m.toFixed(3)} m × ${alto_ajustado_m.toFixed(3)} m</p>
+      <p><small>(${Math.round(ancho_mm)} mm × ${Math.round(alto_mm)} mm)</small></p>
+      <p><strong>Superficie (m²):</strong> ${m2.toFixed(2)}</p>
       <p><strong>Metros lineales pulidos:</strong> ${mlCanto.toFixed(2)}</p>
       <p><strong>Base sin IVA:</strong> ${base.toFixed(2)} €</p>
-      <p><strong>IVA 21%:</strong> ${iva.toFixed(2)} €</p>
+      <p><strong>IVA 21 %:</strong> ${iva.toFixed(2)} €</p>
       <p><strong>Total:</strong> ${total.toFixed(2)} €</p>
     `;
 
@@ -105,28 +115,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // === REINICIAR ===
-  btnReiniciar.addEventListener("click", () => {
-    document.querySelectorAll("input").forEach(el => (el.value = ""));
-    document.getElementById("tipoVidrio").value = "";
-    document.getElementById("resultado").innerHTML = `
-      <p><strong>Medida facturación:</strong> —</p>
-      <p><strong>Superficie ajustada (m²):</strong> —</p>
-      <p><strong>Metros lineales pulidos:</strong> —</p>
-      <p><strong>Base sin IVA:</strong> —</p>
-      <p><strong>IVA 21%:</strong> —</p>
-      <p><strong>Total:</strong> —</p>`;
-    edgesSelected = [];
-    edgeButtons.forEach(b => b.classList.remove("active"));
-  });
+  btnReiniciar.addEventListener("click", () => location.reload());
 
-  // === PDF ===
+  // === EXPORTAR PDF ===
   const { jsPDF } = window.jspdf;
-
   btnPDF.addEventListener("click", () => {
     const doc = new jsPDF();
     doc.addImage("logo.png", "PNG", 10, 10, 30, 20);
     doc.setFontSize(14);
-    doc.text("Vidres Sosa - Cálculo Manual", 50, 20);
+    doc.text("Vidres Sosa - Cálculo Manual (múltiplos de 6 mm)", 50, 20);
     const resultado = document.getElementById("resultado").innerText;
     doc.setFontSize(11);
     doc.text(resultado.split("\n"), 10, 45);
