@@ -292,6 +292,26 @@ footer {
 }
 
 /* =========================================================
+   CAMPOS DE MEDIDA ORDENADOS
+   ========================================================= */
+
+.grid-medidas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.grid-medidas .campo {
+  flex: 1 1 48%;
+}
+
+.grid-medidas label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+/* =========================================================
    RESPONSIVE
    ========================================================= */
 
@@ -313,5 +333,9 @@ footer {
   .edge-btn {
     flex: 1 1 45%;
     text-align: center;
+  }
+
+  .grid-medidas .campo {
+    flex: 1 1 100%;
   }
 }
