@@ -1,31 +1,23 @@
-// login.js
-document.addEventListener('DOMContentLoaded', () => {
-  const btnLogin = document.getElementById('btnLogin');
-  const passwordInput = document.getElementById('password');
-  const errorEl = document.getElementById('error');
+document.addEventListener("DOMContentLoaded", () => {
+  const btnLogin = document.getElementById("btnLogin");
+  const passwordInput = document.getElementById("password");
+  const errorText = document.getElementById("error");
+  const loginScreen = document.getElementById("login-screen");
+  const modeScreen = document.getElementById("mode-screen");
 
-  // 🔐 Contraseña correcta (configurada por Pau)
-  const CONTRASEÑA_CORRECTA = '123';
-
-  function iniciarSesion() {
+  btnLogin.addEventListener("click", () => {
     const password = passwordInput.value.trim();
-    if (password === CONTRASEÑA_CORRECTA) {
-      try {
-        sessionStorage.setItem('logueado', 'true');
-      } catch (e) {
-        console.warn('El almacenamiento de sesión no está disponible');
-      }
-      // Redirige a la calculadora (ajusta el nombre del archivo si es distinto)
-      window.location.href = 'calculadora.html';
+    if (password === "123") {
+      loginScreen.classList.add("hidden");
+      modeScreen.classList.remove("hidden");
     } else {
-      errorEl.textContent = 'Contraseña incorrecta. Inténtalo de nuevo.';
-      passwordInput.value = '';
+      errorText.textContent = "Contraseña incorrecta";
+      passwordInput.value = "";
       passwordInput.focus();
     }
-  }
+  });
 
-  btnLogin.addEventListener('click', iniciarSesion);
-  passwordInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') iniciarSesion();
+  passwordInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") btnLogin.click();
   });
 });
