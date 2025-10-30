@@ -6,7 +6,73 @@
   <meta name="description" content="Vidres Sosa · Cálculo por Tarifa Mapfre" />
   <title>Vidres Sosa · Cálculo por Tarifa</title>
 
-  <link rel="stylesheet" href="style.css" />
+  <!-- ======== ESTILO INTEGRADO ======== -->
+  <style>
+    :root {
+      --verde: #198754;
+      --rojo: #d62828;
+      --fondo: #f7f8fa;
+      --texto: #333;
+      --borde: #e5e5e5;
+      --radio: 10px;
+      --sombra: rgba(0, 0, 0, 0.08);
+    }
+
+    * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+
+    body { margin: 0; background: var(--fondo); color: var(--texto); }
+
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #fff; padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--borde);
+      box-shadow: 0 2px 4px var(--sombra);
+    }
+
+    .logo { width: 130px; }
+
+    .boton-volver {
+      text-decoration: none; color: var(--verde);
+      border: 1px solid var(--verde); padding: 0.4rem 0.8rem;
+      border-radius: var(--radio);
+      transition: 0.2s; font-weight: 500;
+    }
+    .boton-volver:hover { background: var(--verde); color: #fff; }
+
+    main.contenedor { max-width: 800px; margin: 1.5rem auto; padding: 1rem; }
+
+    .bloque {
+      background: #fff;
+      border: 1px solid var(--borde);
+      border-radius: var(--radio);
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 6px var(--sombra);
+    }
+
+    .fila { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.8rem; }
+    label { font-weight: 600; }
+    input, select, button {
+      padding: 0.5rem 0.7rem; font-size: 1rem;
+      border: 1px solid var(--borde); border-radius: var(--radio);
+    }
+
+    button { cursor: pointer; background: var(--verde); color: #fff; border: none; font-weight: 500; }
+    button:hover { background: #157347; }
+
+    .botones { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+
+    .grupo-cantos { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+    .edge-btn {
+      background: #e9ecef; color: #333; border: 1px solid #ccc;
+      padding: 0.4rem 0.8rem; border-radius: var(--radio); cursor: pointer;
+    }
+    .edge-btn.activo { background: var(--verde); color: #fff; border-color: var(--verde); }
+
+    .resultado p { margin: 0.3rem 0; }
+  </style>
+
+  <!-- ======== LIBRERÍAS ======== -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="script_tarifa.js" defer></script>
 </head>
@@ -14,10 +80,8 @@
 <body>
   <header class="topbar">
     <img src="logo.png" alt="Vidres Sosa" class="logo">
-    <h1>Calculadora · Modo Tarifa Mapfre</h1>
-    <nav>
-      <a href="manual.html" class="boton-volver">Modo Manual</a>
-    </nav>
+    <h1 style="color:var(--verde);">Modo Tarifa · Vidres Sosa</h1>
+    <nav><a href="manual.html" class="boton-volver">Modo Manual</a></nav>
   </header>
 
   <main class="contenedor">
@@ -66,8 +130,8 @@
 
       <div class="botones">
         <button id="btnCalcular">Calcular</button>
-        <button id="btnReiniciar">Reiniciar</button>
-        <button id="btnPDF">Exportar PDF</button>
+        <button id="btnReiniciar" style="background:gray;">Reiniciar</button>
+        <button id="btnPDF" style="background:var(--rojo);">Exportar PDF</button>
       </div>
     </section>
 
