@@ -1,4 +1,4 @@
-// ======== VIDRES SOSA · script_tarifa.js v1.0 ======== //
+// ======== VIDRES SOSA · script_tarifa.js v1.1 (GitHub Pages compatible) ======== //
 
 document.addEventListener("DOMContentLoaded", () => {
   const anchoInput = document.getElementById("ancho");
@@ -80,10 +80,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return total;
   }
 
-  // -------- CARGAR CSVs --------
+  // -------- CARGAR CSVs (desde GitHub RAW) --------
   Promise.all([
-    fetch("tarifa_vidrios.csv").then(r => r.text()),
-    fetch("tarifa_cantos.csv").then(r => r.text())
+    fetch("https://raw.githubusercontent.com/paanser/logro-o/main/tarifa_vidrios.csv").then(r => r.text()),
+    fetch("https://raw.githubusercontent.com/paanser/logro-o/main/tarifa_cantos.csv").then(r => r.text())
   ])
   .then(([vidriosCSV, cantosCSV]) => {
     const vidrios = parseCSV(vidriosCSV);
