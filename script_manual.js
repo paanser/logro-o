@@ -1,12 +1,12 @@
-// ======== VIDRES SOSA · script_manual.js v1.3 ======== //
-// Formato Pau, áreas real y corregida, precios sin y con IVA (21%)
+// ======== VIDRES SOSA · script_manual.js v1.4 ======== //
+// Versión ajustada por Pau · Cálculo sin popups ni avisos
 
 document.addEventListener("DOMContentLoaded", () => {
   const anchoInput = document.getElementById("ancho");
   const altoInput = document.getElementById("alto");
   const espesorInput = document.getElementById("espesor");
   const tipoVidrioInput = document.getElementById("tipoVidrio");
-  const ajusteMultiplo6 = document.getElementById("ajusteMultiplo6");
+  const precioM2Input = document.getElementById("precioM2");
   const precioCantoML = document.getElementById("precioCantoML");
   const btnCalcular = document.getElementById("btnCalcular");
   const btnReiniciar = document.getElementById("btnReiniciar");
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (l === "superior" || l === "inferior") total += anchoM;
       if (l === "izquierdo" || l === "derecho") total += altoM;
     });
-    return total; // en metros lineales
+    return total;
   }
 
   // -------- CÁLCULO PRINCIPAL --------
@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const alto = parseFormatoPauToMeters(altoInput.value);
     const espesor = parseFloat(espesorInput.value) || 0;
     const tipo = tipoVidrioInput.value.trim() || "Sin especificar";
+    const precioM2 = parseFloat(precioM2Input.value) || 0;
     const precioCanto = parseFloat(precioCantoML.value) || 0;
 
     if (!ancho || !alto) {
@@ -98,17 +99,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const anchoCorr = ajusteMultiplo6.checked ? redondearAMultiplo6cm(ancho) : ancho;
-    const altoCorr  = ajusteMultiplo6.checked ? redondearAMultiplo6cm(alto)  : alto;
+    // Redondeo automático a múltiplos de 6 cm
+    const anchoCorr = redondearAMultiplo6cm(ancho);
+    const altoCorr = redondearAMultiplo6cm(alto);
 
     const areaReal = ancho * alto;
     const areaCorr = anchoCorr * altoCorr;
 
     const perimetro = calcularPerimetroML(ancho, alto);
     const perimetroCorr = calcularPerimetroML(anchoCorr, altoCorr);
-
-    // Base de precio: suponemos que el usuario pondrá €/m²
-    const precioM2 = parseFloat(prompt("Introduce precio €/m² (sin IVA):", "45")) || 0;
 
     const baseReal = areaReal * precioM2 + perimetro * precioCanto;
     const baseCorr = areaCorr * precioM2 + perimetroCorr * precioCanto;
@@ -120,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     resultadoDiv.innerHTML = `
       <p><b>Tipo de vidrio:</b> ${tipo}</p>
-      <p><b>Espesor:</b> ${espesor} mm</p>
+      <p><b>Espesor:</b> ${espesor ? espesor + " mm" : "—"}</p>
       <hr>
       <p><b>Medidas reales:</b> ${formatearMedida(ancho)} × ${formatearMedida(alto)}</p>
       <p><b>Área real:</b> ${areaReal.toFixed(3)} m²</p>
