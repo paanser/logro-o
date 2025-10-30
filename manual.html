@@ -55,6 +55,29 @@
     </section>
 
     <!-- ==============================
+         1.1. METRAJE MÍNIMO OPCIONAL
+         ============================== -->
+    <section class="card">
+      <h2>Metraje mínimo (opcional)</h2>
+
+      <div class="campo">
+        <label>
+          <input type="checkbox" id="usarMetrajeMinimo">
+          Aplicar metraje mínimo
+        </label>
+      </div>
+
+      <div id="opcionesMetraje" class="grid-medidas" style="display:none;">
+        <label><input type="radio" name="minimo" value="0.5" checked> 0,50 m²</label>
+        <label><input type="radio" name="minimo" value="0.7"> 0,70 m²</label>
+      </div>
+
+      <p class="nota">
+        Si está activado, el cálculo aplicará el mínimo elegido en caso de que la superficie real sea inferior.
+      </p>
+    </section>
+
+    <!-- ==============================
          2. CANTOS PULIDOS
          ============================== -->
     <section class="card">
