@@ -1,112 +1,120 @@
 // =========================================================
-// VIDRES SOSA · CÁLCULO POR TARIFA (v2.3 FINAL)
+// VIDRES SOSA · SCRIPT TARIFA MAPFRE
 // =========================================================
 
 document.addEventListener("DOMContentLoaded", () => {
-  const btnCalcularTarifa = document.getElementById("btnCalcularTarifa");
-  const btnPDFTarifa = document.getElementById("btnPDFTarifa");
-  const tarifaTipo = document.getElementById("tarifa-tipo");
-  const tarifaResultado = document.getElementById("tarifa-resultado");
+  const ancho = document.getElementById("ancho");
+  const alto = document.getElementById("alto");
+  const vidrioSelect = document.getElementById("vidrio");
+  const cantoSelect = document.getElementById("canto");
+  const calcularBtn = document.getElementById("calcular");
+  const nuevoBtn = document.getElementById("nuevo");
+  const pdfBtn = document.getElementById("pdf");
 
-  let tarifasVidrios = {};
-  let tarifasCantos = {};
+  const superficieTxt = document.getElementById("superficie");
+  const precioVidrioTxt = document.getElementById("precioVidrio");
+  const precioCantosTxt = document.getElementById("precioCantos");
+  const subtotalTxt = document.getElementById("subtotal");
+  const ivaTxt = document.getElementById("iva");
+  const totalTxt = document.getElementById("total");
 
-  // === FUNCIÓN AJUSTAR MÚLTIPLO DE 6 SUPERIOR ===
-  function ajustarMultiploSuperior(valor) {
-    if (!valor) return 0;
-    const resto = valor % 6;
-    return resto === 0 ? valor : valor + (6 - resto);
-  }
+  let tarifasVidrio = [];
+  let tarifasCantos = [];
+  let precioVidrio = 0;
+  let precioCanto = 0;
 
-  // === CARGA DE TARIFAS CSV ===
+  // === Cargar CSVs ===
   Promise.all([
     fetch("tarifa_vidrios.csv").then(r => r.text()),
     fetch("tarifa_cantos.csv").then(r => r.text())
   ])
-    .then(([vidriosData, cantosData]) => {
-      tarifasVidrios = parseCSV(vidriosData);
-      tarifasCantos = parseCSV(cantosData);
-      actualizarSelectorVidrios(tarifasVidrios);
-    })
-    .catch(err => console.error("Error cargando tarifas:", err));
+  .then(([vidriosCSV, cantosCSV]) => {
+    tarifasVidrio = parseCSV(vidriosCSV);
+    tarifasCantos = parseCSV(cantosCSV);
+    cargarOpciones(vidrioSelect, tarifasVidrio);
+    cargarOpciones(cantoSelect, tarifasCantos);
+  })
+  .catch(err => console.error("Error al cargar tarifas:", err));
 
-  // === PARSEO DE CSV ===
   function parseCSV(text) {
-    const lines = text.trim().split("\n").slice(1);
-    const data = {};
-    lines.forEach(line => {
-      const [nombre, valor] = line.split(",");
-      data[nombre.trim()] = parseFloat(valor.replace(",", "."));
-    });
-    return data;
-  }
-
-  // === ACTUALIZAR SELECT DE VIDRIOS ===
-  function actualizarSelectorVidrios(data) {
-    tarifaTipo.innerHTML = "";
-    Object.keys(data).forEach(nombre => {
-      const option = document.createElement("option");
-      option.value = nombre;
-      option.textContent = nombre;
-      tarifaTipo.appendChild(option);
+    return text.trim().split("\n").slice(1).map(line => {
+      const [nombre, precio] = line.split(",");
+      return { nombre: nombre.trim(), precio: parseFloat(precio) || 0 };
     });
   }
 
-  // === CALCULAR TARIFA ===
-  btnCalcularTarifa.addEventListener("click", () => {
-    const ancho = parseFloat(document.getElementById("tarifa-ancho").value);
-    const alto = parseFloat(document.getElementById("tarifa-alto").value);
-    const tipo = tarifaTipo.value;
-    const usarCantos = document.getElementById("usarCantosTarifa").checked;
-    const ajustar = document.getElementById("ajusteMultiplo6Tarifa").checked;
+  function cargarOpciones(select, lista) {
+    lista.forEach(item => {
+      const opt = document.createElement("option");
+      opt.value = item.precio;
+      opt.textContent = `${item.nombre} (${item.precio.toFixed(2)} €/m²)`;
+      select.appendChild(opt);
+    });
+  }
 
-    if (!ancho || !alto || !tipo) {
-      alert("Completa todos los campos.");
+  // === Calcular ===
+  calcularBtn.addEventListener("click", () => {
+    const anchoCm = parseFloat(ancho.value);
+    const altoCm = parseFloat(alto.value);
+    if (!anchoCm || !altoCm || !vidrioSelect.value) {
+      alert("Introduce medidas y selecciona un tipo de vidrio.");
       return;
     }
 
-    // Ajuste múltiplos de 6 mm superior
-    const anchoAjustado = ajustar ? ajustarMultiploSuperior(ancho) : ancho;
-    const altoAjustado = ajustar ? ajustarMultiploSuperior(alto) : alto;
+    precioVidrio = parseFloat(vidrioSelect.value);
+    precioCanto = parseFloat(cantoSelect.value) || 0;
 
-    // Cálculo del área en m²
-    const areaM2 = Math.ceil(((anchoAjustado * altoAjustado) / 1_000_000) * 100) / 100;
-    const precioM2 = tarifasVidrios[tipo] || 0;
-    const precioVidrio = areaM2 * precioM2;
+    const anchoM = Math.ceil(anchoCm / 6) * 6 / 100;
+    const altoM = Math.ceil(altoCm / 6) * 6 / 100;
+    const superficie = anchoM * altoM;
 
-    // Cantos opcionales
-    let precioCantos = 0;
-    if (usarCantos) {
-      const perimetro = ((anchoAjustado + altoAjustado) * 2) / 1000;
-      const precioML = tarifasCantos["Canto Pulido"] || 0;
-      precioCantos = perimetro * precioML;
-    }
+    // Cálculo de cantos seleccionados
+    let metrosLineales = 0;
+    if (document.getElementById("canto-superior").checked) metrosLineales += anchoM;
+    if (document.getElementById("canto-inferior").checked) metrosLineales += anchoM;
+    if (document.getElementById("canto-izquierda").checked) metrosLineales += altoM;
+    if (document.getElementById("canto-derecha").checked) metrosLineales += altoM;
 
-    const subtotal = precioVidrio + precioCantos;
+    const precioVidrioTotal = superficie * precioVidrio;
+    const precioCantosTotal = metrosLineales * precioCanto;
+    const subtotal = precioVidrioTotal + precioCantosTotal;
     const iva = subtotal * 0.21;
     const total = subtotal + iva;
 
-    tarifaResultado.innerHTML = `
-      <p><strong>Vidrio:</strong> ${tipo}</p>
-      <p><strong>Área ajustada (m²):</strong> ${areaM2.toFixed(2)}</p>
-      <p><strong>Precio vidrio:</strong> ${precioVidrio.toFixed(2)} €</p>
-      <p><strong>Precio cantos:</strong> ${precioCantos.toFixed(2)} €</p>
-      <p><strong>Subtotal:</strong> ${subtotal.toFixed(2)} €</p>
-      <p><strong>IVA (21 %):</strong> ${iva.toFixed(2)} €</p>
-      <p><strong>Total:</strong> ${total.toFixed(2)} €</p>
-    `;
+    superficieTxt.textContent = `Superficie ajustada: ${superficie.toFixed(3)} m²`;
+    precioVidrioTxt.textContent = `Precio vidrio: ${precioVidrioTotal.toFixed(2)} €`;
+    precioCantosTxt.textContent = `Precio cantos: ${precioCantosTotal.toFixed(2)} €`;
+    subtotalTxt.textContent = `Subtotal (sin IVA): ${subtotal.toFixed(2)} €`;
+    ivaTxt.textContent = `IVA (21 %): ${iva.toFixed(2)} €`;
+    totalTxt.textContent = `Total con IVA: ${total.toFixed(2)} €`;
   });
 
-  // === EXPORTAR PDF ===
-  const { jsPDF } = window.jspdf;
-  btnPDFTarifa.addEventListener("click", () => {
+  // === Nuevo cálculo ===
+  nuevoBtn.addEventListener("click", () => {
+    [ancho, alto].forEach(el => el.value = "");
+    vidrioSelect.selectedIndex = 0;
+    cantoSelect.selectedIndex = 0;
+    document.querySelectorAll(".cantos input").forEach(c => c.checked = false);
+    [superficieTxt, precioVidrioTxt, precioCantosTxt, subtotalTxt, ivaTxt, totalTxt]
+      .forEach(el => el.textContent = "-");
+  });
+
+  // === Exportar PDF ===
+  pdfBtn.addEventListener("click", () => {
+    const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.addImage("logo.png", "PNG", 10, 10, 30, 20);
     doc.setFontSize(14);
-    doc.text("Vidres Sosa - Cálculo por Tarifa", 50, 20);
-    const resultado = tarifaResultado.innerText;
+    doc.text("Vidres Sosa · Cálculo por Tarifa Mapfre", 10, 15);
     doc.setFontSize(11);
-    doc.text(resultado.split("\n"), 10, 45);
-    doc.save("resultado_tarifa.pdf");
+    doc.text(`Medidas: ${ancho.value} x ${alto.value} cm`, 10, 30);
+    doc.text(`Vidrio: ${vidrioSelect.options[vidrioSelect.selectedIndex].text}`, 10, 40);
+    doc.text(`Canto: ${cantoSelect.options[cantoSelect.selectedIndex].text}`, 10, 50);
+    doc.text(superficieTxt.textContent, 10, 70);
+    doc.text(precioVidrioTxt.textContent, 10, 80);
+    doc.text(precioCantosTxt.textContent, 10, 90);
+    doc.text(subtotalTxt.textContent, 10, 100);
+    doc.text(ivaTxt.textContent, 10, 110);
+    doc.text(totalTxt.textContent, 10, 120);
+    doc.save("presupuesto_tarifa.pdf");
   });
 });
