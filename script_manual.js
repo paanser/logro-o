@@ -1,27 +1,22 @@
-// ======== VIDRES SOSA · script_manual.js v1.9 ======== //
+// ======== VIDRES SOSA · script_manual.js v1.10 ======== //
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ---- CAMPOS PRINCIPALES ----
   const anchoInput = document.getElementById("ancho");
   const altoInput = document.getElementById("alto");
-  const espesorInput = document.getElementById("espesor");
   const tipoVidrioInput = document.getElementById("tipoVidrio");
   const precioM2Input = document.getElementById("precioM2");
   const precioCantoML = document.getElementById("precioCantoML");
   const margenInput = document.getElementById("margenComercial");
-
   const btnCalcular = document.getElementById("btnCalcular");
   const btnReiniciar = document.getElementById("btnReiniciar");
   const btnPDF = document.getElementById("btnPDF");
   const resultadoDiv = document.getElementById("resultado");
   const cantoBtns = document.querySelectorAll(".edge-btn");
-
-  const IVA = 0.21;
-
-  // ---- METRAJE MÍNIMO ----
   const minimo05 = document.getElementById("minimo05");
   const minimo07 = document.getElementById("minimo07");
+  const IVA = 0.21;
 
+  // --- Solo una casilla mínima ---
   minimo05.addEventListener("change", () => {
     if (minimo05.checked) minimo07.checked = false;
   });
@@ -29,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (minimo07.checked) minimo05.checked = false;
   });
 
-  // ---- CANTOS PULIDOS ----
+  // --- CANTOS ---
   let ladosActivos = [];
   cantoBtns.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -51,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ---- FUNCIONES AUXILIARES ----
+  // --- Funciones ---
   const parseFormatoPauToMeters = raw => {
     if (!raw) return NaN;
     const s = String(raw).trim().replace(",", ".");
@@ -67,16 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const redondearAMultiplo6cm = m => !isFinite(m) ? NaN : Math.ceil(m / 0.06) * 0.06;
 
-  const formatearMedida = m => {
-    if (!isFinite(m)) return "—";
-    const totalMm = Math.round(m * 1000);
-    const metros = Math.floor(totalMm / 1000);
-    const resto = totalMm % 1000;
-    const cm = Math.floor(resto / 10);
-    const mm = resto % 10;
-    return `${metros} m ${cm} cm ${mm} mm`;
-  };
-
   const calcularPerimetroML = (ancho, alto) => {
     let total = 0;
     ladosActivos.forEach(l => {
@@ -86,11 +71,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return total;
   };
 
-  // ---- CÁLCULO PRINCIPAL ----
+  // --- Cálculo principal ---
   function calcular() {
     const ancho = parseFormatoPauToMeters(anchoInput.value);
     const alto = parseFormatoPauToMeters(altoInput.value);
-    const tipo = tipoVidrioInput.value.trim() || "—";
     const precioM2 = parseFloat(precioM2Input.value) || 0;
     const precioCanto = parseFloat(precioCantoML.value) || 0;
     const margen = parseFloat(margenInput.value) || 0;
@@ -100,14 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // --- Calcular áreas ---
     const anchoCorr = redondearAMultiplo6cm(ancho);
     const altoCorr = redondearAMultiplo6cm(alto);
     const areaReal = ancho * alto;
     let areaCorr = anchoCorr * altoCorr;
     let textoMinimo = "—";
 
-    // --- Aplicar metraje mínimo solo si es menor ---
     if (minimo05.checked && areaCorr < 0.5) {
       areaCorr = 0.5;
       textoMinimo = "Metraje mínimo 0,50 m² aplicado";
@@ -116,10 +98,64 @@ document.addEventListener("DOMContentLoaded", () => {
       textoMinimo = "Metraje mínimo 0,70 m² aplicado";
     }
 
-    // --- Perímetro y precios ---
     const perimetro = calcularPerimetroML(anchoCorr, altoCorr);
     const precioVidrio = areaCorr * precioM2;
     const precioCantos = perimetro * precioCanto;
-
     let base = precioVidrio + precioCantos;
-    const importeMargen = margen >
+    const importeMargen = margen > 0 ? base * (margen / 100) : 0;
+    base += importeMargen;
+    const iva = base * IVA;
+    const total = base + iva;
+
+    resultadoDiv.innerHTML = `
+      <p><b>Medida real:</b> ${ancho.toFixed(3)} m × ${alto.toFixed(3)} m</p>
+      <p><b>Superficie real:</b> ${areaReal.toFixed(3)} m²</p>
+      <p><b>Medida ajustada (múltiplos 6 cm):</b> ${anchoCorr.toFixed(3)} m × ${altoCorr.toFixed(3)} m</p>
+      <p><b>Superficie ajustada usada:</b> ${areaCorr.toFixed(3)} m²</p>
+      <p style="color:green;"><b>${textoMinimo}</b></p>
+      <p><b>Metros lineales de canto pulido:</b> ${perimetro.toFixed(3)} ml</p>
+      <p><b>Precio vidrio (${precioM2.toFixed(2)} €/m²):</b> ${precioVidrio.toFixed(2)} €</p>
+      <p><b>Precio cantos (${precioCanto.toFixed(2)} €/ml):</b> ${precioCantos.toFixed(2)} €</p>
+      <hr>
+      <p><b>Margen comercial:</b> ${margen.toFixed(1)} % (+${importeMargen.toFixed(2)} €)</p>
+      <p><b>Base sin IVA:</b> ${base.toFixed(2)} €</p>
+      <p><b>IVA (21 %):</b> ${iva.toFixed(2)} €</p>
+      <p><b>Total con IVA:</b> ${total.toFixed(2)} €</p>
+    `;
+  }
+
+  btnCalcular.addEventListener("click", calcular);
+
+  btnReiniciar.addEventListener("click", () => {
+    document.querySelectorAll("input").forEach(i => {
+      if (["checkbox", "radio"].includes(i.type)) i.checked = false;
+      else i.value = "";
+    });
+    ladosActivos = [];
+    cantoBtns.forEach(b => b.classList.remove("activo"));
+    resultadoDiv.innerHTML = `
+      <p><strong>Medida real:</strong> —</p>
+      <p><strong>Superficie real (m²):</strong> —</p>
+      <p><strong>Medida ajustada:</strong> —</p>
+      <p><strong>Superficie ajustada (m²):</strong> —</p>
+      <p><strong>Metros lineales del canto pulido:</strong> —</p>
+      <p><strong>Precio del vidrio ajustado (m²):</strong> —</p>
+      <p><strong>Precio del canto pulido (ML):</strong> —</p>
+      <p><strong>Base sin IVA:</strong> —</p>
+      <p><strong>IVA 21 %:</strong> —</p>
+      <p><strong>Total con IVA:</strong> —</p>`;
+  });
+
+  // --- PDF ---
+  const { jsPDF } = window.jspdf;
+  btnPDF.addEventListener("click", () => {
+    const doc = new jsPDF();
+    doc.addImage("logo.png", "PNG", 10, 10, 30, 20);
+    doc.setFontSize(14);
+    doc.text("Vidres Sosa – Cálculo Manual", 50, 20);
+    doc.setFontSize(11);
+    const contenido = resultadoDiv.innerText.split("\n");
+    doc.text(contenido, 10, 40);
+    doc.save("resultado_manual.pdf");
+  });
+});
