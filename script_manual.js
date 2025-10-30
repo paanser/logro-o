@@ -1,5 +1,4 @@
-// ======== VIDRES SOSA · script_manual.js v1.4 ======== //
-// Versión ajustada por Pau · Cálculo sin popups ni avisos
+// ======== VIDRES SOSA · script_manual.js v1.5 ======== //
 
 document.addEventListener("DOMContentLoaded", () => {
   const anchoInput = document.getElementById("ancho");
@@ -44,17 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!raw) return NaN;
     const s = String(raw).trim().replace(",", ".");
     if (!s.includes(".")) return parseFloat(s);
-
     const [mStr, fracRaw] = s.split(".");
     const m = parseFloat(mStr) || 0;
     let frac = (fracRaw || "").replace(/\D/g, "");
     if (frac.length > 3) frac = frac.slice(0, 3);
     while (frac.length < 3) frac += "0";
-
     const d1 = +frac[0] || 0;
     const d2 = +frac[1] || 0;
     const d3 = +frac[2] || 0;
-
     const cm = d1 * 10 + d2;
     const mm = d3;
     return m + cm / 100 + mm / 1000;
@@ -90,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const ancho = parseFormatoPauToMeters(anchoInput.value);
     const alto = parseFormatoPauToMeters(altoInput.value);
     const espesor = parseFloat(espesorInput.value) || 0;
-    const tipo = tipoVidrioInput.value.trim() || "Sin especificar";
+    const tipo = tipoVidrioInput.value.trim() || "—";
     const precioM2 = parseFloat(precioM2Input.value) || 0;
     const precioCanto = parseFloat(precioCantoML.value) || 0;
 
@@ -99,39 +95,30 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Redondeo automático a múltiplos de 6 cm
     const anchoCorr = redondearAMultiplo6cm(ancho);
     const altoCorr = redondearAMultiplo6cm(alto);
 
     const areaReal = ancho * alto;
     const areaCorr = anchoCorr * altoCorr;
+    const perimetro = calcularPerimetroML(anchoCorr, altoCorr);
 
-    const perimetro = calcularPerimetroML(ancho, alto);
-    const perimetroCorr = calcularPerimetroML(anchoCorr, altoCorr);
-
-    const baseReal = areaReal * precioM2 + perimetro * precioCanto;
-    const baseCorr = areaCorr * precioM2 + perimetroCorr * precioCanto;
-
-    const ivaReal = baseReal * IVA;
-    const ivaCorr = baseCorr * IVA;
-    const totalReal = baseReal + ivaReal;
-    const totalCorr = baseCorr + ivaCorr;
+    const precioVidrio = areaCorr * precioM2;
+    const precioCantos = perimetro * precioCanto;
+    const base = precioVidrio + precioCantos;
+    const iva = base * IVA;
+    const total = base + iva;
 
     resultadoDiv.innerHTML = `
-      <p><b>Tipo de vidrio:</b> ${tipo}</p>
-      <p><b>Espesor:</b> ${espesor ? espesor + " mm" : "—"}</p>
-      <hr>
-      <p><b>Medidas reales:</b> ${formatearMedida(ancho)} × ${formatearMedida(alto)}</p>
-      <p><b>Área real:</b> ${areaReal.toFixed(3)} m²</p>
-      <p><b>Perímetro real:</b> ${perimetro.toFixed(2)} ml</p>
-      <p><b>Base sin IVA (real):</b> ${baseReal.toFixed(2)} €</p>
-      <p><b>Total con IVA (real):</b> ${totalReal.toFixed(2)} €</p>
-      <hr>
-      <p><b>Medidas corregidas (múltiplos 6 cm):</b> ${formatearMedida(anchoCorr)} × ${formatearMedida(altoCorr)}</p>
-      <p><b>Área corregida:</b> ${areaCorr.toFixed(3)} m²</p>
-      <p><b>Perímetro corregido:</b> ${perimetroCorr.toFixed(2)} ml</p>
-      <p><b>Base sin IVA (corregida):</b> ${baseCorr.toFixed(2)} €</p>
-      <p><b>Total con IVA (corregida):</b> ${totalCorr.toFixed(2)} €</p>
+      <p><b>Medida real:</b> ${formatearMedida(ancho)} × ${formatearMedida(alto)}</p>
+      <p><b>Superficie real:</b> ${areaReal.toFixed(3)} m²</p>
+      <p><b>Medida ajustada (múltiplos 6 cm):</b> ${formatearMedida(anchoCorr)} × ${formatearMedida(altoCorr)}</p>
+      <p><b>Superficie ajustada:</b> ${areaCorr.toFixed(3)} m²</p>
+      <p><b>Metros lineales del canto pulido:</b> ${perimetro.toFixed(2)} ml</p>
+      <p><b>Precio del vidrio ajustado (m²):</b> ${precioVidrio.toFixed(2)} €</p>
+      <p><b>Precio del canto pulido (ML):</b> ${precioCantos.toFixed(2)} €</p>
+      <p><b>Base sin IVA:</b> ${base.toFixed(2)} €</p>
+      <p><b>IVA (21%):</b> ${iva.toFixed(2)} €</p>
+      <p><b>Total con IVA:</b> ${total.toFixed(2)} €</p>
     `;
   }
 
@@ -143,12 +130,16 @@ document.addEventListener("DOMContentLoaded", () => {
     ladosActivos = [];
     cantoBtns.forEach(b => b.classList.remove("activo"));
     resultadoDiv.innerHTML = `
-      <p><strong>Medida facturación (ajustada):</strong> —</p>
-      <p><strong>Superficie (m²):</strong> —</p>
-      <p><strong>Metros lineales pulidos:</strong> —</p>
+      <p><strong>Medida real:</strong> —</p>
+      <p><strong>Superficie real (m²):</strong> —</p>
+      <p><strong>Medida ajustada:</strong> —</p>
+      <p><strong>Superficie ajustada (m²):</strong> —</p>
+      <p><strong>Metros lineales del canto pulido:</strong> —</p>
+      <p><strong>Precio del vidrio ajustado (m²):</strong> —</p>
+      <p><strong>Precio del canto pulido (ML):</strong> —</p>
       <p><strong>Base sin IVA:</strong> —</p>
       <p><strong>IVA 21 %:</strong> —</p>
-      <p><strong>Total:</strong> —</p>`;
+      <p><strong>Total con IVA:</strong> —</p>`;
   });
 
   // -------- EXPORTAR PDF --------
@@ -159,7 +150,6 @@ document.addEventListener("DOMContentLoaded", () => {
     doc.setFontSize(14);
     doc.text("Vidres Sosa – Cálculo Manual", 50, 20);
     doc.setFontSize(11);
-
     const contenido = resultadoDiv.innerText.split("\n");
     doc.text(contenido, 10, 40);
     doc.save("resultado_manual.pdf");
