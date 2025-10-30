@@ -60,20 +60,21 @@
     <section class="card">
       <h2>Metraje mínimo (opcional)</h2>
 
-      <div class="campo">
+      <div class="grid-medidas">
         <label>
-          <input type="checkbox" id="usarMetrajeMinimo">
-          Aplicar metraje mínimo
+          <input type="checkbox" id="minimo05">
+          Aplicar metraje mínimo de <b>0,50 m²</b>
+        </label>
+
+        <label>
+          <input type="checkbox" id="minimo07">
+          Aplicar metraje mínimo de <b>0,70 m²</b>
         </label>
       </div>
 
-      <div id="opcionesMetraje" class="grid-medidas" style="display:none;">
-        <label><input type="radio" name="minimo" value="0.5" checked> 0,50 m²</label>
-        <label><input type="radio" name="minimo" value="0.7"> 0,70 m²</label>
-      </div>
-
       <p class="nota">
-        Si está activado, el cálculo aplicará el mínimo elegido en caso de que la superficie real sea inferior.
+        Si marcas una casilla, el cálculo se realizará con ese metraje mínimo aunque la medida real sea menor.<br>
+        Si no marcas ninguna, se calculará según la superficie ajustada en múltiplos de 6 cm.
       </p>
     </section>
 
@@ -101,7 +102,6 @@
     <section class="card">
       <h2>Resultados</h2>
 
-      <!-- Campo nuevo para margen comercial -->
       <div class="campo separacion-extra">
         <label for="margenComercial">Margen comercial (%)</label>
         <input type="number" id="margenComercial" step="0.1" placeholder="Ej. 15">
