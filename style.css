@@ -46,6 +46,11 @@ body {
   margin: 0;
 }
 
+.logo-barra {
+  width: 120px;
+  margin-right: 0.8rem;
+}
+
 .btn-secundario {
   background: transparent;
   border: 1px solid var(--verde);
@@ -62,7 +67,76 @@ body {
 }
 
 /* =========================================================
-   CONTENEDOR PRINCIPAL
+   LOGIN / PANTALLA DE ACCESO
+   ========================================================= */
+
+.login-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #fff;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.logo {
+  width: 180px;
+  max-width: 70%;
+  margin-bottom: 1.2rem;
+}
+
+.login-screen h2 {
+  font-size: 1.3rem;
+  color: var(--verde);
+  margin-bottom: 1rem;
+}
+
+.login-screen input {
+  width: 220px;
+  padding: 0.5rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.login-screen button {
+  background: var(--verde);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radio);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.login-screen button:hover {
+  background: #146c43;
+}
+
+.error {
+  color: var(--rojo);
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* =========================================================
+   MENÚ PRINCIPAL
+   ========================================================= */
+
+.mode-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+/* =========================================================
+   CONTENEDOR GENERAL Y TARJETAS
    ========================================================= */
 
 .container {
@@ -229,4 +303,18 @@ footer {
   color: #777;
   margin-top: 2rem;
   margin-bottom: 1rem;
+}
+
+/* =========================================================
+   SECCIONES Y IFRAME
+   ========================================================= */
+
+.hidden {
+  display: none !important;
+}
+
+.iframe-calculadora {
+  width: 100%;
+  height: calc(100vh - 100px);
+  border: none;
 }
