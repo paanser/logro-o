@@ -3,81 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Modo Tarifa · Vidres Sosa</title>
+  <meta name="description" content="Vidres Sosa · Cálculo por Tarifa Mapfre">
+  <title>Vidres Sosa · Cálculo por Tarifa</title>
 
-  <!-- Estilos y librerías -->
   <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="script_tarifa.js" defer></script>
 </head>
 
 <body>
-  <!-- CABECERA -->
   <header class="topbar">
-    <h1>Modo Tarifa · Vidres Sosa</h1>
-    <button id="backToMenu2" class="btn-secundario">← Volver</button>
+    <img src="logo.png" alt="Vidres Sosa" class="logo-peq">
+    <h1>Calculadora por Tarifa</h1>
+    <nav>
+      <a href="manual.html" class="boton-volver">Modo Manual</a>
+    </nav>
   </header>
 
-  <!-- CONTENEDOR PRINCIPAL -->
-  <main class="container">
+  <main class="contenedor">
+    <section class="bloque">
+      <h2>Datos del Vidrio</h2>
 
-    <!-- ==============================
-         1. DATOS DE MEDIDA
-         ============================== -->
-    <section class="card">
-      <h2>1️⃣ Datos de medida</h2>
-
-      <label for="tarifa-ancho">Ancho (mm)</label>
-      <input type="number" id="tarifa-ancho" placeholder="Ej. 1000">
-
-      <label for="tarifa-alto">Alto (mm)</label>
-      <input type="number" id="tarifa-alto" placeholder="Ej. 550">
-
-      <div class="ajuste">
-        <input type="checkbox" id="ajusteMultiplo6Tarifa" checked>
-        <label for="ajusteMultiplo6Tarifa">Ajustar medidas a múltiplos de 6 mm (superior)</label>
+      <div class="fila">
+        <label for="ancho">Ancho (cm):</label>
+        <input type="number" id="ancho" placeholder="Ej. 125">
       </div>
-    </section>
 
-    <!-- ==============================
-         2. TIPO DE VIDRIO
-         ============================== -->
-    <section class="card">
-      <h2>2️⃣ Tipo de vidrio</h2>
-      <label for="tarifa-tipo">Selecciona tipo según tarifa</label>
-      <select id="tarifa-tipo"></select>
+      <div class="fila">
+        <label for="alto">Alto (cm):</label>
+        <input type="number" id="alto" placeholder="Ej. 85">
+      </div>
 
-      <label class="checkbox">
-        <input type="checkbox" id="usarCantosTarifa">
-        <span>Incluir cantos pulidos según tarifa</span>
-      </label>
-    </section>
+      <div class="fila">
+        <label for="vidrio">Tipo de vidrio (Tarifa Mapfre):</label>
+        <select id="vidrio">
+          <option value="">Selecciona tipo de vidrio...</option>
+        </select>
+      </div>
 
-    <!-- ==============================
-         3. CALCULAR Y RESULTADOS
-         ============================== -->
-    <section class="card">
-      <h2>3️⃣ Calcular</h2>
+      <div class="fila">
+        <label for="canto">Tipo de canto pulido:</label>
+        <select id="canto">
+          <option value="">Selecciona tipo de canto...</option>
+        </select>
+      </div>
+
+      <div class="fila">
+        <label>Cantos a aplicar:</label>
+        <div class="cantos">
+          <label><input type="checkbox" id="canto-superior"> Superior</label>
+          <label><input type="checkbox" id="canto-inferior"> Inferior</label>
+          <label><input type="checkbox" id="canto-izquierda"> Izquierda</label>
+          <label><input type="checkbox" id="canto-derecha"> Derecha</label>
+        </div>
+      </div>
 
       <div class="botones">
-        <button id="btnCalcularTarifa" class="btn verde">Calcular</button>
-        <button id="btnPDFTarifa" class="btn rojo">Exportar PDF</button>
-      </div>
-
-      <div id="tarifa-resultado" class="resultado">
-        <p><strong>Vidrio:</strong> —</p>
-        <p><strong>Área ajustada (m²):</strong> —</p>
-        <p><strong>Precio vidrio:</strong> —</p>
-        <p><strong>Precio cantos:</strong> —</p>
-        <p><strong>Subtotal:</strong> —</p>
-        <p><strong>IVA (21 %):</strong> —</p>
-        <p><strong>Total:</strong> —</p>
+        <button id="calcular">Calcular precio</button>
+        <button id="nuevo">Nuevo cálculo</button>
+        <button id="pdf">Exportar PDF</button>
       </div>
     </section>
-  </main>
 
-  <footer>
-    <p>© 2025 Vidres Sosa · Cálculo por Tarifa</p>
-  </footer>
+    <section class="bloque resultado">
+      <h2>Resultado</h2>
+      <p id="superficie">Superficie ajustada: -</p>
+      <p id="precioVidrio">Precio vidrio: -</p>
+      <p id="precioCantos">Precio cantos: -</p>
+      <p id="subtotal">Subtotal (sin IVA): -</p>
+      <p id="iva">IVA (21 %): -</p>
+      <p id="total">Total con IVA: -</p>
+    </section>
+  </main>
 </body>
 </html>
