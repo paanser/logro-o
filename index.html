@@ -3,77 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Calculadora de vidrios Vidres Sosa — cálculo manual y por tarifa con exportación a PDF.">
-  <title>Vidres Sosa · Calculadora de Vidrios</title>
-
-  <!-- Estilos generales -->
+  <title>Vidres Sosa · Calculadora</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- Librería PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-
-  <!-- Scripts -->
-  <script src="login.js" defer></script>
 </head>
 
 <body>
-  <!-- ==========================
-       LOGIN / ACCESO
-       ========================== -->
-  <section id="login-section" class="login-screen">
+  <header class="topbar">
     <img src="logo.png" alt="Vidres Sosa" class="logo">
-    <h2>Acceso a Calculadora</h2>
+    <h1>Calculadora de Vidrios</h1>
+  </header>
 
-    <input type="password" id="password" placeholder="Introduce la contraseña">
-    <button id="btnLogin">Entrar</button>
-    <p id="login-error" class="error"></p>
-  </section>
-
-  <!-- ==========================
-       MENÚ PRINCIPAL
-       ========================== -->
-  <section id="menu-section" class="hidden">
-    <header class="topbar">
-      <img src="logo.png" alt="Vidres Sosa" class="logo-barra">
-      <h1>Calculadora Vidres Sosa</h1>
-    </header>
-
-    <main class="container">
-      <h2>Selecciona modo de cálculo</h2>
-      <div class="mode-buttons">
-        <button id="btnManual" class="btn verde">Cálculo Manual</button>
-        <button id="btnTarifa" class="btn rojo">Cálculo por Tarifa</button>
+  <main class="container center">
+    <section class="card">
+      <h2>Selecciona un modo de cálculo</h2>
+      <div class="botones">
+        <a href="manual.html" class="btn verde">Modo Manual</a>
+        <a href="tarifa.html" class="btn rojo">Modo Tarifa</a>
       </div>
-    </main>
+    </section>
+  </main>
 
-    <footer>
-      <p>© 2025 Vidres Sosa · Sistema de cálculo profesional</p>
-      <p>Desarrollado por Pau Sosa</p>
-    </footer>
-  </section>
-
-  <!-- ==========================
-       MODO MANUAL
-       ========================== -->
-  <section id="manual-section" class="hidden">
-    <header class="topbar">
-      <h1>Modo Manual · Vidres Sosa</h1>
-      <button id="backToMenu1" class="btn-secundario">← Volver</button>
-    </header>
-
-    <iframe src="manual.html" class="iframe-calculadora" title="Modo Manual"></iframe>
-  </section>
-
-  <!-- ==========================
-       MODO TARIFA
-       ========================== -->
-  <section id="tarifa-section" class="hidden">
-    <header class="topbar">
-      <h1>Modo Tarifa · Vidres Sosa</h1>
-      <button id="backToMenu2" class="btn-secundario">← Volver</button>
-    </header>
-
-    <iframe src="tarifa.html" class="iframe-calculadora" title="Modo Tarifa"></iframe>
-  </section>
+  <footer>
+    <p>© 2025 Vidres Sosa · Todos los derechos reservados</p>
+  </footer>
 </body>
 </html>
