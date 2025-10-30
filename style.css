@@ -1,10 +1,104 @@
 /* =========================================================
-   VIDRES SOSA · ESTILOS MODO MANUAL
+   VIDRES SOSA · ESTILO GENERAL (VERDE & ROJO CORPORATIVO)
    ========================================================= */
+
+:root {
+  --verde: #198754;   /* color principal Vidres Sosa */
+  --rojo: #d62828;    /* color secundario */
+  --fondo: #f7f8fa;
+  --texto: #333;
+  --borde: #e5e5e5;
+  --radio: 10px;
+  --sombra: rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+}
+
+/* =========================================================
+   CABECERA SUPERIOR
+   ========================================================= */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--borde);
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbar h1 {
+  font-size: 1.2rem;
+  color: var(--verde);
+  margin: 0;
+}
+
+.btn-secundario {
+  background: transparent;
+  border: 1px solid var(--verde);
+  color: var(--verde);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radio);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-secundario:hover {
+  background: var(--verde);
+  color: #fff;
+}
+
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+   ========================================================= */
+
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: 0 2px 4px var(--sombra);
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.card h2 {
+  color: var(--verde);
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* =========================================================
+   CAMPOS Y FORMULARIOS
+   ========================================================= */
+
+.grid-medidas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
 
 .grid-medidas.horizontal {
   display: flex;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .grid-medidas.horizontal .campo {
@@ -23,41 +117,116 @@
 }
 
 .campo input {
-  padding: 0.5rem;
+  padding: 0.55rem;
   border: 1px solid var(--borde);
   border-radius: var(--radio);
   font-size: 1rem;
 }
 
 .campo.separacion-extra {
-  margin-top: 1rem;
+  margin-top: 1.2rem;
 }
 
-/* Botones de cantos */
+/* =========================================================
+   BOTONES GENERALES
+   ========================================================= */
+
+.btn {
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border-radius: var(--radio);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn.verde {
+  background: var(--verde);
+  color: #fff;
+}
+
+.btn.verde:hover {
+  background: #146c43;
+}
+
+.btn.rojo {
+  background: var(--rojo);
+  color: #fff;
+}
+
+.btn.rojo:hover {
+  background: #b31f1f;
+}
+
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+/* =========================================================
+   CANTOS PULIDOS
+   ========================================================= */
+
 .cantos {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.6rem;
   margin-bottom: 0.8rem;
 }
 
 .edge-btn {
   flex: 1;
   min-width: 100px;
-  padding: 0.5rem 0.8rem;
+  padding: 0.55rem 0.8rem;
   background: #f1f1f1;
   border: 1px solid var(--borde);
   border-radius: var(--radio);
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .edge-btn:hover {
-  background: #e7e7e7;
+  background: #e9ecef;
 }
 
 .edge-btn.activo {
-  background-color: var(--verde);
+  background: var(--verde);
   color: #fff;
   border-color: var(--verde);
+}
+
+/* =========================================================
+   RESULTADOS
+   ========================================================= */
+
+.resultado {
+  background: #fafafa;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1rem;
+  font-size: 0.95rem;
+}
+
+.resultado p {
+  margin: 0.4rem 0;
+}
+
+.resultado hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 0.8rem 0;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #777;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
 }
