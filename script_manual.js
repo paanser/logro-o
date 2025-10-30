@@ -1,4 +1,4 @@
-// ======== VIDRES SOSA · script_manual.js v1.6 ======== //
+// ======== VIDRES SOSA · script_manual.js v1.7 ======== //
 
 document.addEventListener("DOMContentLoaded", () => {
   const anchoInput = document.getElementById("ancho");
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cantoBtns = document.querySelectorAll(".edge-btn");
   const IVA = 0.21;
 
-  // -------- NUEVOS ELEMENTOS METRAJE MÍNIMO --------
+  // -------- METRAJE MÍNIMO (desde manual.html) --------
   const usarMetrajeMinimo = document.getElementById("usarMetrajeMinimo");
   const opcionesMetraje = document.getElementById("opcionesMetraje");
 
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const ancho = parseFormatoPauToMeters(anchoInput.value);
     const alto = parseFormatoPauToMeters(altoInput.value);
     const espesor = parseFloat(espesorInput.value) || 0;
-    const tipo = tipoVidrioInput.value.trim() || "—";
+    const tipo = (tipoVidrioInput.value || "").trim() || "—";
     const precioM2 = parseFloat(precioM2Input.value) || 0;
     const precioCanto = parseFloat(precioCantoML.value) || 0;
 
@@ -113,29 +113,45 @@ document.addEventListener("DOMContentLoaded", () => {
     const areaReal = ancho * alto;
     let areaCorr = anchoCorr * altoCorr;
 
-    // --- Aplicar metraje mínimo si está activado ---
+    // --- Aplicar metraje mínimo "forzado" si está marcado ---
+    let textoMinimo = "—";
     if (usarMetrajeMinimo && usarMetrajeMinimo.checked) {
       const minimo = parseFloat(document.querySelector('input[name="minimo"]:checked').value);
-      if (areaCorr < minimo) areaCorr = minimo;
+      areaCorr = minimo; // forzar a 0,50 o 0,70 m² exactamente
+      textoMinimo = `${minimo.toFixed(2)} m²`;
     }
 
-    // --- Perímetro y precios ---
+    // --- Perímetro y precios base ---
     const perimetro = calcularPerimetroML(anchoCorr, altoCorr);
     const precioVidrio = areaCorr * precioM2;
     const precioCantos = perimetro * precioCanto;
-    const base = precioVidrio + precioCantos;
-    const iva = base * IVA;
-    const total = base + iva;
+    const baseSinMargen = precioVidrio + precioCantos;
 
+    // --- Preguntar margen comercial (%), aplicarlo antes del IVA ---
+    let margenStr = prompt("Margen comercial (%)", "0");
+    let margenPct = parseFloat(String(margenStr).replace(",", ".")); 
+    if (!isFinite(margenPct)) margenPct = 0;
+
+    const importeMargen = baseSinMargen * (margenPct / 100);
+    const baseConMargen = baseSinMargen + importeMargen;
+
+    // --- IVA y total ---
+    const iva = baseConMargen * IVA;
+    const total = baseConMargen + iva;
+
+    // --- Salida ---
     resultadoDiv.innerHTML = `
       <p><b>Medida real:</b> ${formatearMedida(ancho)} × ${formatearMedida(alto)}</p>
       <p><b>Superficie real:</b> ${areaReal.toFixed(3)} m²</p>
       <p><b>Medida ajustada (múltiplos 6 cm):</b> ${formatearMedida(anchoCorr)} × ${formatearMedida(altoCorr)}</p>
-      <p><b>Superficie ajustada:</b> ${areaCorr.toFixed(3)} m²</p>
+      <p><b>Superficie ajustada ${usarMetrajeMinimo && usarMetrajeMinimo.checked ? "(metraje mínimo)" : ""}:</b> ${areaCorr.toFixed(3)} m² ${usarMetrajeMinimo && usarMetrajeMinimo.checked ? `· Mínimo aplicado: ${textoMinimo}` : ""}</p>
       <p><b>Metros lineales del canto pulido:</b> ${perimetro.toFixed(2)} ml</p>
-      <p><b>Precio del vidrio ajustado (m²):</b> ${precioVidrio.toFixed(2)} €</p>
+      <p><b>Precio del vidrio (m² × €/m²):</b> ${precioVidrio.toFixed(2)} €</p>
       <p><b>Precio del canto pulido (ML):</b> ${precioCantos.toFixed(2)} €</p>
-      <p><b>Base sin IVA:</b> ${base.toFixed(2)} €</p>
+      <hr>
+      <p><b>Base sin margen (sin IVA):</b> ${baseSinMargen.toFixed(2)} €</p>
+      <p><b>Margen comercial (${margenPct.toFixed(2)}%):</b> +${importeMargen.toFixed(2)} €</p>
+      <p><b>Base con margen (sin IVA):</b> ${baseConMargen.toFixed(2)} €</p>
       <p><b>IVA (21%):</b> ${iva.toFixed(2)} €</p>
       <p><b>Total con IVA:</b> ${total.toFixed(2)} €</p>
     `;
