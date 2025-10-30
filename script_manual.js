@@ -1,4 +1,4 @@
-// ======== VIDRES SOSA · script_manual.js v1.5 ======== //
+// ======== VIDRES SOSA · script_manual.js v1.6 ======== //
 
 document.addEventListener("DOMContentLoaded", () => {
   const anchoInput = document.getElementById("ancho");
@@ -13,6 +13,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultadoDiv = document.getElementById("resultado");
   const cantoBtns = document.querySelectorAll(".edge-btn");
   const IVA = 0.21;
+
+  // -------- NUEVOS ELEMENTOS METRAJE MÍNIMO --------
+  const usarMetrajeMinimo = document.getElementById("usarMetrajeMinimo");
+  const opcionesMetraje = document.getElementById("opcionesMetraje");
+
+  if (usarMetrajeMinimo && opcionesMetraje) {
+    usarMetrajeMinimo.addEventListener("change", () => {
+      opcionesMetraje.style.display = usarMetrajeMinimo.checked ? "flex" : "none";
+    });
+  }
 
   // -------- LADOS SELECCIONADOS --------
   let ladosActivos = [];
@@ -95,13 +105,22 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // --- Múltiplos de 6 cm ---
     const anchoCorr = redondearAMultiplo6cm(ancho);
     const altoCorr = redondearAMultiplo6cm(alto);
 
+    // --- Áreas ---
     const areaReal = ancho * alto;
-    const areaCorr = anchoCorr * altoCorr;
-    const perimetro = calcularPerimetroML(anchoCorr, altoCorr);
+    let areaCorr = anchoCorr * altoCorr;
 
+    // --- Aplicar metraje mínimo si está activado ---
+    if (usarMetrajeMinimo && usarMetrajeMinimo.checked) {
+      const minimo = parseFloat(document.querySelector('input[name="minimo"]:checked').value);
+      if (areaCorr < minimo) areaCorr = minimo;
+    }
+
+    // --- Perímetro y precios ---
+    const perimetro = calcularPerimetroML(anchoCorr, altoCorr);
     const precioVidrio = areaCorr * precioM2;
     const precioCantos = perimetro * precioCanto;
     const base = precioVidrio + precioCantos;
@@ -126,7 +145,11 @@ document.addEventListener("DOMContentLoaded", () => {
   btnCalcular.addEventListener("click", calcular);
 
   btnReiniciar.addEventListener("click", () => {
-    document.querySelectorAll("input").forEach(i => (i.value = ""));
+    document.querySelectorAll("input").forEach(i => {
+      if (i.type === "checkbox" || i.type === "radio") i.checked = false;
+      else i.value = "";
+    });
+    if (opcionesMetraje) opcionesMetraje.style.display = "none";
     ladosActivos = [];
     cantoBtns.forEach(b => b.classList.remove("activo"));
     resultadoDiv.innerHTML = `
