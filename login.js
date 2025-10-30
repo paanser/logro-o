@@ -1,64 +1,64 @@
-// =========================================================
-// VIDRES SOSA · SISTEMA DE ACCESO Y NAVEGACIÓN ENTRE MODOS
-// =========================================================
+// ======== VIDRES SOSA · login.js v1.3 ======== //
+// Controla el acceso, navegación entre menús y modos de cálculo
 
 document.addEventListener("DOMContentLoaded", () => {
-  // === SECCIONES PRINCIPALES ===
+  // Secciones principales
   const loginSection = document.getElementById("login-section");
   const menuSection = document.getElementById("menu-section");
   const manualSection = document.getElementById("manual-section");
   const tarifaSection = document.getElementById("tarifa-section");
 
-  // === ELEMENTOS DE LOGIN ===
-  const btnLogin = document.getElementById("btnLogin");
+  // Elementos de login
   const passwordInput = document.getElementById("password");
+  const btnLogin = document.getElementById("btnLogin");
   const loginError = document.getElementById("login-error");
 
-  // === EVENTO DE LOGIN ===
-  btnLogin.addEventListener("click", () => {
-    const clave = passwordInput.value.trim();
-
-    if (clave === "123") {
-      loginSection.classList.add("hidden");
-      menuSection.classList.remove("hidden");
-    } else {
-      loginError.textContent = "❌ Contraseña incorrecta.";
-      passwordInput.value = "";
-      passwordInput.focus();
-    }
-  });
-
-  // === BOTONES DE MENÚ ===
+  // Botones del menú
   const btnManual = document.getElementById("btnManual");
   const btnTarifa = document.getElementById("btnTarifa");
   const backToMenu1 = document.getElementById("backToMenu1");
   const backToMenu2 = document.getElementById("backToMenu2");
 
-  // Ir a modo manual
+  const PASSWORD_CORRECTA = "123"; // Cambia aquí la contraseña si lo deseas
+
+  // ----- LOGIN -----
+  btnLogin.addEventListener("click", () => {
+    const password = passwordInput.value.trim();
+
+    if (password === PASSWORD_CORRECTA) {
+      loginSection.classList.add("hidden");
+      menuSection.classList.remove("hidden");
+      loginError.textContent = "";
+      passwordInput.value = "";
+    } else {
+      loginError.textContent = "Contraseña incorrecta.";
+    }
+  });
+
+  // Permitir Enter para entrar
+  passwordInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") btnLogin.click();
+  });
+
+  // ----- MENÚ PRINCIPAL -----
   btnManual.addEventListener("click", () => {
     menuSection.classList.add("hidden");
     manualSection.classList.remove("hidden");
-    manualSection.scrollIntoView({ behavior: "smooth" });
   });
 
-  // Ir a modo tarifa
   btnTarifa.addEventListener("click", () => {
     menuSection.classList.add("hidden");
     tarifaSection.classList.remove("hidden");
-    tarifaSection.scrollIntoView({ behavior: "smooth" });
   });
 
-  // Volver al menú desde modo manual
+  // ----- BOTONES VOLVER -----
   backToMenu1.addEventListener("click", () => {
     manualSection.classList.add("hidden");
     menuSection.classList.remove("hidden");
-    window.scrollTo({ top: 0 });
   });
 
-  // Volver al menú desde modo tarifa
   backToMenu2.addEventListener("click", () => {
     tarifaSection.classList.add("hidden");
     menuSection.classList.remove("hidden");
-    window.scrollTo({ top: 0 });
   });
 });
