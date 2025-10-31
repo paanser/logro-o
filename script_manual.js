@@ -1,52 +1,15 @@
-// ======== VIDRES SOSA · script_manual.js v1.10 ======== //
-
+// ======== VIDRES SOSA · script_manual.js v2.0 MULTIVIDRIO ======== //
 document.addEventListener("DOMContentLoaded", () => {
-  const anchoInput = document.getElementById("ancho");
-  const altoInput = document.getElementById("alto");
-  const tipoVidrioInput = document.getElementById("tipoVidrio");
-  const precioM2Input = document.getElementById("precioM2");
-  const precioCantoML = document.getElementById("precioCantoML");
-  const margenInput = document.getElementById("margenComercial");
-  const btnCalcular = document.getElementById("btnCalcular");
-  const btnReiniciar = document.getElementById("btnReiniciar");
+  const contenedor = document.getElementById("glassContainer");
+  const addGlassBtn = document.getElementById("addGlass");
+  const resumenGeneral = document.getElementById("resumenGeneral");
+  const totalResumen = document.getElementById("totalResumen");
   const btnPDF = document.getElementById("btnPDF");
-  const resultadoDiv = document.getElementById("resultado");
-  const cantoBtns = document.querySelectorAll(".edge-btn");
-  const minimo05 = document.getElementById("minimo05");
-  const minimo07 = document.getElementById("minimo07");
+  const btnReiniciarTodo = document.getElementById("btnReiniciarTodo");
   const IVA = 0.21;
+  let listaVidrios = [];
 
-  // --- Solo una casilla mínima ---
-  minimo05.addEventListener("change", () => {
-    if (minimo05.checked) minimo07.checked = false;
-  });
-  minimo07.addEventListener("change", () => {
-    if (minimo07.checked) minimo05.checked = false;
-  });
-
-  // --- CANTOS ---
-  let ladosActivos = [];
-  cantoBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const lado = btn.dataset.edge;
-      if (lado === "perimetral") {
-        const todos = ["superior", "inferior", "izquierdo", "derecho"];
-        const activar = ladosActivos.length !== 4;
-        ladosActivos = activar ? [...todos] : [];
-        cantoBtns.forEach(b => b.classList.toggle("activo", activar));
-        return;
-      }
-      if (ladosActivos.includes(lado)) {
-        ladosActivos = ladosActivos.filter(l => l !== lado);
-        btn.classList.remove("activo");
-      } else {
-        ladosActivos.push(lado);
-        btn.classList.add("activo");
-      }
-    });
-  });
-
-  // --- Funciones ---
+  // ===== FUNCIONES AUXILIARES =====
   const parseFormatoPauToMeters = raw => {
     if (!raw) return NaN;
     const s = String(raw).trim().replace(",", ".");
@@ -59,103 +22,210 @@ document.addEventListener("DOMContentLoaded", () => {
     const d1 = +frac[0] || 0, d2 = +frac[1] || 0, d3 = +frac[2] || 0;
     return m + (d1 * 10 + d2) / 100 + d3 / 1000;
   };
+  const redondearAMultiplo6cm = m =>
+    !isFinite(m) ? NaN : Math.ceil(m / 0.06) * 0.06;
 
-  const redondearAMultiplo6cm = m => !isFinite(m) ? NaN : Math.ceil(m / 0.06) * 0.06;
+  // ===== AÑADIR NUEVO VIDRIO =====
+  addGlassBtn.addEventListener("click", () => {
+    const id = Date.now();
+    const card = document.createElement("div");
+    card.className = "card vidrio-card";
+    card.dataset.id = id;
 
-  const calcularPerimetroML = (ancho, alto) => {
-    let total = 0;
-    ladosActivos.forEach(l => {
-      if (["superior", "inferior"].includes(l)) total += ancho;
-      if (["izquierdo", "derecho"].includes(l)) total += alto;
+    card.innerHTML = `
+      <h3>Vidrio #${listaVidrios.length + 1}</h3>
+      <div class="grid-medidas horizontal">
+        <div class="campo"><label>Ancho (m)</label><input type="number" step="0.001" class="ancho"></div>
+        <div class="campo"><label>Alto (m)</label><input type="number" step="0.001" class="alto"></div>
+      </div>
+      <div class="grid-medidas">
+        <div class="campo"><label>Espesor (mm) (opcional)</label><input type="number" class="espesor"></div>
+        <div class="campo"><label>Tipo de vidrio (opcional)</label><input type="text" class="tipoVidrio"></div>
+      </div>
+      <div class="campo"><label>Precio del m² (€)</label><input type="number" step="0.01" class="precioM2"></div>
+      <div class="campo"><label>Precio ML canto (€)</label><input type="number" step="0.01" class="precioCantoML"></div>
+
+      <div class="cantos">
+        <button class="edge-btn" data-edge="superior">Superior</button>
+        <button class="edge-btn" data-edge="inferior">Inferior</button>
+        <button class="edge-btn" data-edge="izquierdo">Izquierdo</button>
+        <button class="edge-btn" data-edge="derecho">Derecho</button>
+        <button class="edge-btn" data-edge="perimetral">Perimetral</button>
+      </div>
+
+      <div class="campo">
+        <label><input type="checkbox" class="minimo05"> Mínimo 0,50 m²</label><br>
+        <label><input type="checkbox" class="minimo07"> Mínimo 0,70 m²</label>
+      </div>
+
+      <div class="campo"><label>Margen comercial (%)</label><input type="number" step="0.1" class="margen"></div>
+
+      <div class="botones">
+        <button class="btn verde btnCalcular">Calcular</button>
+        <button class="btn rojo btnEliminar">Eliminar</button>
+      </div>
+
+      <div class="resultado"></div>
+    `;
+    contenedor.appendChild(card);
+    resumenGeneral.style.display = "block";
+    prepararVidrio(card);
+  });
+
+  // ===== CONFIGURAR FUNCIONALIDAD DE CADA VIDRIO =====
+  function prepararVidrio(card) {
+    const botonesCantos = card.querySelectorAll(".edge-btn");
+    let ladosActivos = [];
+    botonesCantos.forEach(b => {
+      b.addEventListener("click", () => {
+        const lado = b.dataset.edge;
+        if (lado === "perimetral") {
+          const todos = ["superior","inferior","izquierdo","derecho"];
+          const activar = ladosActivos.length !== 4;
+          ladosActivos = activar ? [...todos] : [];
+          botonesCantos.forEach(bt => bt.classList.toggle("activo", activar));
+          return;
+        }
+        if (ladosActivos.includes(lado)) {
+          ladosActivos = ladosActivos.filter(l => l !== lado);
+          b.classList.remove("activo");
+        } else {
+          ladosActivos.push(lado);
+          b.classList.add("activo");
+        }
+      });
     });
-    return total;
-  };
 
-  // --- Cálculo principal ---
-  function calcular() {
-    const ancho = parseFormatoPauToMeters(anchoInput.value);
-    const alto = parseFormatoPauToMeters(altoInput.value);
-    const precioM2 = parseFloat(precioM2Input.value) || 0;
-    const precioCanto = parseFloat(precioCantoML.value) || 0;
-    const margen = parseFloat(margenInput.value) || 0;
+    const calcularBtn = card.querySelector(".btnCalcular");
+    const eliminarBtn = card.querySelector(".btnEliminar");
+    const resultadoDiv = card.querySelector(".resultado");
 
-    if (!ancho || !alto || !precioM2) {
-      resultadoDiv.innerHTML = `<p style="color:red;">Introduce medidas y precio válidos.</p>`;
-      return;
-    }
+    calcularBtn.addEventListener("click", () => {
+      const ancho = parseFormatoPauToMeters(card.querySelector(".ancho").value);
+      const alto = parseFormatoPauToMeters(card.querySelector(".alto").value);
+      const precioM2 = parseFloat(card.querySelector(".precioM2").value) || 0;
+      const precioCanto = parseFloat(card.querySelector(".precioCantoML").value) || 0;
+      const margen = parseFloat(card.querySelector(".margen").value) || 0;
+      const minimo05 = card.querySelector(".minimo05").checked;
+      const minimo07 = card.querySelector(".minimo07").checked;
 
-    const anchoCorr = redondearAMultiplo6cm(ancho);
-    const altoCorr = redondearAMultiplo6cm(alto);
-    const areaReal = ancho * alto;
-    let areaCorr = anchoCorr * altoCorr;
-    let textoMinimo = "—";
+      if (!ancho || !alto || !precioM2) {
+        resultadoDiv.innerHTML = `<p style="color:red;">Introduce medidas y precio válidos.</p>`;
+        return;
+      }
 
-    if (minimo05.checked && areaCorr < 0.5) {
-      areaCorr = 0.5;
-      textoMinimo = "Metraje mínimo 0,50 m² aplicado";
-    } else if (minimo07.checked && areaCorr < 0.7) {
-      areaCorr = 0.7;
-      textoMinimo = "Metraje mínimo 0,70 m² aplicado";
-    }
+      const anchoCorr = redondearAMultiplo6cm(ancho);
+      const altoCorr = redondearAMultiplo6cm(alto);
+      const areaReal = ancho * alto;
+      let areaCorr = anchoCorr * altoCorr;
+      let textoMinimo = "—";
 
-    const perimetro = calcularPerimetroML(anchoCorr, altoCorr);
-    const precioVidrio = areaCorr * precioM2;
-    const precioCantos = perimetro * precioCanto;
-    let base = precioVidrio + precioCantos;
-    const importeMargen = margen > 0 ? base * (margen / 100) : 0;
-    base += importeMargen;
-    const iva = base * IVA;
-    const total = base + iva;
+      if (minimo05 && areaCorr < 0.5) { areaCorr = 0.5; textoMinimo = "Mínimo 0,50 m²"; }
+      else if (minimo07 && areaCorr < 0.7) { areaCorr = 0.7; textoMinimo = "Mínimo 0,70 m²"; }
 
-    resultadoDiv.innerHTML = `
-      <p><b>Medida real:</b> ${ancho.toFixed(3)} m × ${alto.toFixed(3)} m</p>
-      <p><b>Superficie real:</b> ${areaReal.toFixed(3)} m²</p>
-      <p><b>Medida ajustada (múltiplos 6 cm):</b> ${anchoCorr.toFixed(3)} m × ${altoCorr.toFixed(3)} m</p>
-      <p><b>Superficie ajustada usada:</b> ${areaCorr.toFixed(3)} m²</p>
-      <p style="color:green;"><b>${textoMinimo}</b></p>
-      <p><b>Metros lineales de canto pulido:</b> ${perimetro.toFixed(3)} ml</p>
-      <p><b>Precio vidrio (${precioM2.toFixed(2)} €/m²):</b> ${precioVidrio.toFixed(2)} €</p>
-      <p><b>Precio cantos (${precioCanto.toFixed(2)} €/ml):</b> ${precioCantos.toFixed(2)} €</p>
-      <hr>
-      <p><b>Margen comercial:</b> ${margen.toFixed(1)} % (+${importeMargen.toFixed(2)} €)</p>
-      <p><b>Base sin IVA:</b> ${base.toFixed(2)} €</p>
-      <p><b>IVA (21 %):</b> ${iva.toFixed(2)} €</p>
-      <p><b>Total con IVA:</b> ${total.toFixed(2)} €</p>
+      let perimetro = 0;
+      ladosActivos.forEach(l => {
+        if (["superior","inferior"].includes(l)) perimetro += anchoCorr;
+        if (["izquierdo","derecho"].includes(l)) perimetro += altoCorr;
+      });
+
+      const precioVidrio = areaCorr * precioM2;
+      const precioCantos = perimetro * precioCanto;
+      let base = precioVidrio + precioCantos;
+      const impMargen = base * (margen / 100);
+      base += impMargen;
+      const iva = base * IVA;
+      const total = base + iva;
+
+      resultadoDiv.innerHTML = `
+        <p><b>Superficie:</b> ${areaCorr.toFixed(3)} m² (${textoMinimo})</p>
+        <p><b>Perímetro cantos:</b> ${perimetro.toFixed(3)} ml</p>
+        <p><b>Base:</b> ${base.toFixed(2)} €</p>
+        <p><b>IVA (21 %):</b> ${iva.toFixed(2)} €</p>
+        <p><b>Total:</b> ${total.toFixed(2)} €</p>
+      `;
+
+      const idx = listaVidrios.findIndex(v => v.id === card.dataset.id);
+      const datos = {
+        id: card.dataset.id,
+        base,
+        iva,
+        total,
+        ancho,
+        alto,
+        areaCorr,
+        perimetro,
+        precioM2,
+        precioCanto,
+        margen
+      };
+      if (idx >= 0) listaVidrios[idx] = datos;
+      else listaVidrios.push(datos);
+      actualizarTotalGeneral();
+    });
+
+    eliminarBtn.addEventListener("click", () => {
+      listaVidrios = listaVidrios.filter(v => v.id !== card.dataset.id);
+      card.remove();
+      actualizarTotalGeneral();
+      if (listaVidrios.length === 0) resumenGeneral.style.display = "none";
+    });
+  }
+
+  // ===== TOTAL GENERAL =====
+  function actualizarTotalGeneral() {
+    const base = listaVidrios.reduce((s, v) => s + v.base, 0);
+    const iva = listaVidrios.reduce((s, v) => s + v.iva, 0);
+    const total = listaVidrios.reduce((s, v) => s + v.total, 0);
+    totalResumen.innerHTML = `
+      <p><strong>Base sin IVA:</strong> ${base.toFixed(2)} €</p>
+      <p><strong>IVA 21 %:</strong> ${iva.toFixed(2)} €</p>
+      <p><strong>Total con IVA:</strong> ${total.toFixed(2)} €</p>
     `;
   }
 
-  btnCalcular.addEventListener("click", calcular);
-
-  btnReiniciar.addEventListener("click", () => {
-    document.querySelectorAll("input").forEach(i => {
-      if (["checkbox", "radio"].includes(i.type)) i.checked = false;
-      else i.value = "";
-    });
-    ladosActivos = [];
-    cantoBtns.forEach(b => b.classList.remove("activo"));
-    resultadoDiv.innerHTML = `
-      <p><strong>Medida real:</strong> —</p>
-      <p><strong>Superficie real (m²):</strong> —</p>
-      <p><strong>Medida ajustada:</strong> —</p>
-      <p><strong>Superficie ajustada (m²):</strong> —</p>
-      <p><strong>Metros lineales del canto pulido:</strong> —</p>
-      <p><strong>Precio del vidrio ajustado (m²):</strong> —</p>
-      <p><strong>Precio del canto pulido (ML):</strong> —</p>
-      <p><strong>Base sin IVA:</strong> —</p>
-      <p><strong>IVA 21 %:</strong> —</p>
-      <p><strong>Total con IVA:</strong> —</p>`;
-  });
-
-  // --- PDF ---
+  // ===== PDF =====
   const { jsPDF } = window.jspdf;
   btnPDF.addEventListener("click", () => {
+    if (listaVidrios.length === 0) return alert("No hay vidrios calculados.");
     const doc = new jsPDF();
     doc.addImage("logo.png", "PNG", 10, 10, 30, 20);
     doc.setFontSize(14);
-    doc.text("Vidres Sosa – Cálculo Manual", 50, 20);
+    doc.text("Vidres Sosa – Cálculo Manual Multividrio", 50, 20);
     doc.setFontSize(11);
-    const contenido = resultadoDiv.innerText.split("\n");
-    doc.text(contenido, 10, 40);
-    doc.save("resultado_manual.pdf");
+    let y = 40;
+    listaVidrios.forEach((v, i) => {
+      doc.text(`Vidrio #${i + 1} – ${v.areaCorr.toFixed(3)} m²`, 10, y);
+      y += 6;
+      doc.text(
+        `Base: ${v.base.toFixed(2)} €   IVA: ${v.iva.toFixed(
+          2
+        )} €   Total: ${v.total.toFixed(2)} €`,
+        10,
+        y
+      );
+      y += 8;
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+    });
+    const base = listaVidrios.reduce((s, v) => s + v.base, 0);
+    const iva = listaVidrios.reduce((s, v) => s + v.iva, 0);
+    const total = listaVidrios.reduce((s, v) => s + v.total, 0);
+    doc.text(
+      `TOTAL GENERAL: ${total.toFixed(2)} € (IVA ${iva.toFixed(2)} € incluido)`,
+      10,
+      y + 10
+    );
+    doc.save("resultado_multividrio.pdf");
+  });
+
+  // ===== REINICIAR TODO =====
+  btnReiniciarTodo.addEventListener("click", () => {
+    if (!confirm("¿Borrar todos los vidrios?")) return;
+    listaVidrios = [];
+    contenedor.innerHTML = "";
+    resumenGeneral.style.display = "none";
   });
 });
